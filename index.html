@@ -38,7 +38,7 @@ body {
 .game { height: 35vh; background: #0b4dbf; color: white; }
 .intermission { height: 25vh; background: white; color: black; }
 .sirens { height: 10vh; background: red; color: white; }
-.footer { height: 10vh; background: black; color: white; }
+.footer { height: 10vh; background: black; color: rgb(84, 84, 84); }
 
 /* HEADINGS */
 h1, h2 {
@@ -58,19 +58,19 @@ h1, h2 {
 /* GAME TIMER = 25% of GAME SECTION */
 #gameTimer {
   font-size: 6em;
-  flex: 0 0 25%;
+  flex: 0 0 30%;
 }
 
 /* INTERMISSION TIMER = 15% of SECTION */
 #intermissionTimer {
   font-size: 3.75em;
-  flex: 0 0 15%;
+  flex: 0 0 20%;
 }
 
 /* ROWS */
 .row {
   display: flex;
-  gap: 10px;
+  gap: 15px;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -80,25 +80,25 @@ h1, h2 {
 button, select {
   font-family: 'Roboto';
   padding: 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   border: none;
-  background: #666;
-  color: white;
+  background: #b1b1b1;
+  color: rgb(0, 0, 0);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 55px;
+  min-width: 80px;
 }
 
 button svg {
-  width: 18px;
-  height: 18px;
-  fill: white;
+  width: 25px;
+  height: 25px;
+  fill: rgb(0, 0, 0);
 }
 
 button.active {
-  border: 2px solid #00ff00;
+  border: 3px solid #00ff00;
   color: #00ff00;
 }
 
@@ -109,7 +109,7 @@ button.active {
 
 /* FOOTER LINKS */
 a {
-  color: white;
+  color: rgb(66, 160, 186);
 }
 </style>
 </head>
@@ -192,6 +192,7 @@ a {
 </div>
 
 <div class="section footer">
+  <div><a href="instructions.html">instructions</a></div>
   <div>acamapps v1.0</div>
 </div>
 
