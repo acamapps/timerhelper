@@ -8,11 +8,11 @@
 <style>
 @font-face {
   font-family: 'Orbitron';
-  src: url('fonts/Orbitron-Regular.ttf');
+  src: url('fonts/Orbitron-Bold.woff2');
 }
 @font-face {
   font-family: 'Roboto';
-  src: url('fonts/Roboto-Regular.ttf');
+  src: url('fonts/Roboto-Bold.woff2');
 }
 
 body {
@@ -33,11 +33,11 @@ body {
 }
 
 /* HEIGHTS */
-.header { height: 10%; background: black; color: white; justify-content: center; }
+.header { height: 10%; background: rgb(49, 49, 49); color: white; justify-content: center; }
 .game { height: 45%; background: #0b4dbf; color: white; justify-content: flex-start; }
 .intermission { height: 25%; background: white; color: black; justify-content: flex-start; }
 .sirens { height: 10%; background: red; color: white; justify-content: flex-start; }
-.footer { height: 10%; background: black; color: white; justify-content: center; }
+.footer { height: 10%; background: rgb(49, 49, 49); color: white; justify-content: center; }
 
 /* HEADINGS */
 h1, h2 {
@@ -47,22 +47,22 @@ h1, h2 {
 
 /* PIN HEADINGS TO TOP */
 .section h2 {
-  align-self: flex-start;
+  text-align: center;   flex-start;
   margin-top: 5px;
 }
 
-/* TIMERS (50% bigger than before) */
+/* TIMER */
 .timer {
   background: black;
   color: #00ff00;
   font-family: 'Orbitron';
-  font-size: 6em; /* increased from 4em */
+  font-size: 12em; /* increased from 4em */
   padding: 10px 20px;
   border-radius: 8px;
 }
 
 .small-timer {
-  font-size: 3.75em; /* increased from 2.5em */
+  font-size: 8em;
 }
 
 /* ROWS */
@@ -72,14 +72,6 @@ h1, h2 {
   justify-content: center;
   align-items: center;
   width: 100%;
-}
-
-/* LABEL ROW MUST ALIGN WITH BUTTONS */
-.label-row {
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  margin-top: 5px;
 }
 
 /* BUTTONS + DROPDOWNS (ALL GREY) */
@@ -115,7 +107,7 @@ button.active {
 
 /* FOOTER LINKS */
 a {
-  color: white;
+  color: rgb(197, 197, 197);
 }
 </style>
 </head>
@@ -139,15 +131,6 @@ a {
   </div>
 
   <div id="gameTimer" class="timer">00:00</div>
-
-  <!-- LABELS aligned to buttons -->
-  <div class="row label-row">
-    <span>Count</span>
-    <span>Mins</span>
-    <span>Reset</span>
-    <span>Run</span>
-    <span>Pause</span>
-  </div>
 
   <div class="row">
     <button onclick="toggleDirection()" id="directionBtn">Up</button>
@@ -178,13 +161,6 @@ a {
   <h2>Intermissions</h2>
 
   <div id="intermissionTimer" class="timer small-timer">00:00</div>
-
-  <div class="row label-row">
-    <span></span>
-    <span>Mins</span>
-    <span>Reset</span>
-    <span>Run</span>
-  </div>
 
   <div class="row">
     <select id="intermissionSelect"></select>
