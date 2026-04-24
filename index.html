@@ -23,37 +23,49 @@ body {
   font-family: 'Roboto';
 }
 
+/* SECTIONS */
 .section {
   width: 95%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
-.header { height: 10%; background: black; color: white; }
-.game { height: 45%; background: #0b4dbf; color: white; }
-.intermission { height: 25%; background: white; color: black; }
-.sirens { height: 10%; background: red; color: white; }
-.footer { height: 10%; background: black; color: white; }
+/* HEIGHTS */
+.header { height: 10%; background: black; color: white; justify-content: center; }
+.game { height: 45%; background: #0b4dbf; color: white; justify-content: flex-start; }
+.intermission { height: 25%; background: white; color: black; justify-content: flex-start; }
+.sirens { height: 10%; background: red; color: white; justify-content: flex-start; }
+.footer { height: 10%; background: black; color: white; justify-content: center; }
 
+/* HEADINGS */
 h1, h2 {
   font-family: 'Orbitron';
-  margin: 5px;
+  margin: 4px;
 }
 
+/* PIN HEADINGS TO TOP */
+.section h2 {
+  align-self: flex-start;
+  margin-top: 5px;
+}
+
+/* TIMERS (50% bigger than before) */
 .timer {
   background: black;
   color: #00ff00;
   font-family: 'Orbitron';
-  font-size: 4em;
+  font-size: 6em; /* increased from 4em */
   padding: 10px 20px;
   border-radius: 8px;
 }
 
-.small-timer { font-size: 2.5em; }
+.small-timer {
+  font-size: 3.75em; /* increased from 2.5em */
+}
 
+/* ROWS */
 .row {
   display: flex;
   gap: 10px;
@@ -62,32 +74,49 @@ h1, h2 {
   width: 100%;
 }
 
-.intermission .row { width: 60%; }
+/* LABEL ROW MUST ALIGN WITH BUTTONS */
+.label-row {
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 5px;
+}
 
+/* BUTTONS + DROPDOWNS (ALL GREY) */
 button, select {
+  font-family: 'Roboto';
   padding: 10px;
   border-radius: 8px;
   border: none;
-  background: #111;
-  color: #ccc;
+  background: #666;
+  color: white;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 50px;
+  min-width: 55px;
 }
 
+/* SVG ICONS */
 button svg {
   width: 18px;
   height: 18px;
-  fill: currentColor;
+  fill: white;
 }
 
-button.active { color: #00ff00; }
+button.active {
+  color: #00ff00;
+}
 
-button:hover { background: #222; }
+/* INTERMISSION BUTTON SCALE (60% width feel maintained via row) */
+.intermission .row {
+  width: 60%;
+}
 
-a { color: white; }
+/* FOOTER LINKS */
+a {
+  color: white;
+}
 </style>
 </head>
 
@@ -97,6 +126,7 @@ a { color: white; }
   <h1>Footy Timer</h1>
 </div>
 
+<!-- GAME -->
 <div class="section game">
 
   <h2>Game Time</h2>
@@ -110,7 +140,8 @@ a { color: white; }
 
   <div id="gameTimer" class="timer">00:00</div>
 
-  <div class="row">
+  <!-- LABELS aligned to buttons -->
+  <div class="row label-row">
     <span>Count</span>
     <span>Mins</span>
     <span>Reset</span>
@@ -141,11 +172,19 @@ a { color: white; }
 
 </div>
 
+<!-- INTERMISSION -->
 <div class="section intermission">
 
   <h2>Intermissions</h2>
 
   <div id="intermissionTimer" class="timer small-timer">00:00</div>
+
+  <div class="row label-row">
+    <span></span>
+    <span>Mins</span>
+    <span>Reset</span>
+    <span>Run</span>
+  </div>
 
   <div class="row">
     <select id="intermissionSelect"></select>
@@ -161,13 +200,17 @@ a { color: white; }
 
 </div>
 
+<!-- SIRENS -->
 <div class="section sirens">
+
   <h2>Sirens</h2>
+
   <div class="row">
     <button onclick="playSiren('full.mp3')">Full</button>
     <button onclick="playSiren('twomin.mp3')">2-min</button>
     <button onclick="playSiren('onemin.mp3')">1-min</button>
   </div>
+
 </div>
 
 <div class="section footer">
@@ -176,7 +219,15 @@ a { color: white; }
 </div>
 
 <script>
-// DROPDOWNS
+
+/* FULLSCREEN AUTO REQUEST */
+function goFullScreen() {
+  let el = document.documentElement;
+  if (el.requestFullscreen) el.requestFullscreen();
+}
+document.addEventListener("click", goFullScreen, { once: true });
+
+/* DROPDOWNS */
 for (let i=0;i<=30;i++){
   let o=document.createElement("option");
   o.value=i;o.textContent=i;
@@ -188,12 +239,12 @@ for (let i=0;i<=20;i++){
   intermissionSelect.appendChild(o);
 }
 
-// AUDIO
+/* AUDIO */
 function playSiren(file){
   new Audio("sirens/"+file).play();
 }
 
-// GAME TIMER
+/* GAME TIMER */
 let gameSeconds=0, gameInterval=null, countUp=true;
 
 function updateGame(){
@@ -207,7 +258,7 @@ function updateGame(){
 function startGame(){
   if(gameInterval) return;
 
-  playSiren("full.mp3"); // 🔥 start siren
+  playSiren("full.mp3");
 
   gameInterval=setInterval(()=>{
     gameSeconds+=countUp?1:-1;
@@ -218,7 +269,7 @@ function startGame(){
       clearInterval(gameInterval);
       gameInterval=null;
 
-      playSiren("full.mp3"); // 🔥 end siren
+      playSiren("full.mp3");
 
       resetIntermission();
       startIntermission();
@@ -237,7 +288,6 @@ function pauseGame(){
 function resetGame(){
   clearInterval(gameInterval);
   gameInterval=null;
-
   gameSeconds=minutesSelect.value*60;
   updateGame();
 }
@@ -247,7 +297,7 @@ function toggleDirection(){
   directionBtn.textContent=countUp?"Up":"Down";
 }
 
-// INTERMISSION
+/* INTERMISSION */
 let intermissionSeconds=0, intermissionInterval=null;
 let played2=false, played1=false;
 
@@ -269,6 +319,7 @@ function startIntermission(){
       playSiren("twomin.mp3");
       played2=true;
     }
+
     if(intermissionSeconds===60 && !played1){
       playSiren("onemin.mp3");
       played1=true;
@@ -296,12 +347,13 @@ function resetIntermission(){
   updateIntermission();
 }
 
-// QUARTERS
+/* QUARTERS */
 function selectQuarter(btn){
   document.querySelectorAll(".game button")
     .forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
 }
+
 </script>
 
 </body>
