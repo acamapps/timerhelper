@@ -184,7 +184,7 @@ a {
   <h2>Sirens</h2>
 
   <div class="row">
-    <button onclick="playSiren('full.mp3')">Full</button>
+    <button onclick="playSiren('siren.mp3')">Full</button>
     <button onclick="playSiren('twomin.mp3')">2-min</button>
     <button onclick="playSiren('onemin.mp3')">1-min</button>
   </div>
@@ -227,7 +227,7 @@ function updateGame(){
 function startGame(){
   if(gameInterval) return;
 
-  playSiren("full.mp3");
+  playSiren("siren.mp3");
 
   gameInterval=setInterval(()=>{
     gameSeconds+=countUp?1:-1;
@@ -238,7 +238,7 @@ function startGame(){
       clearInterval(gameInterval);
       gameInterval=null;
 
-      playSiren("full.mp3");
+      playSiren("siren.mp3");
 
       resetIntermission();
       startIntermission();
