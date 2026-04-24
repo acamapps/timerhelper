@@ -25,59 +25,46 @@ body {
 
 /* SECTIONS */
 .section {
-  width: 95%;
-  margin: 0 auto;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between; /* key */
+  justify-content: space-evenly;
+  text-align: center;
 }
 
 /* HEIGHTS */
-.header { height: 10%; background: rgb(49, 49, 49); color: white; justify-content: center; }
-.game { height: 45%; background: #0b4dbf; color: white; justify-content: flex-start; }
-.intermission { height: 25%; background: white; color: black; justify-content: flex-start; }
-.sirens { height: 10%; background: red; color: white; justify-content: flex-start; }
-.footer { height: 10%; background: rgb(49, 49, 49); color: white; justify-content: center; }
+.header { height: 10vh; background: black; color: white; }
+.game { height: 35vh; background: #0b4dbf; color: white; }
+.intermission { height: 25vh; background: white; color: black; }
+.sirens { height: 10vh; background: red; color: white; }
+.footer { height: 10vh; background: black; color: white; }
 
 /* HEADINGS */
 h1, h2 {
   font-family: 'Orbitron';
-  margin: 2px;
+  margin: 0;
 }
 
-/* PIN HEADINGS TO TOP */
-.section h2 {
-  text-align: center;
-}
-
-/* TIMER */
-
-
+/* TIMERS (NO BACKGROUND NOW) */
 .timer {
-  color: #00ff00;
   font-family: 'Orbitron';
-
-  height: 25vh;
-  width: 100%;
-
+  color: #00ff00;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  /* 🔥 KEY FIX */
-  font-size: clamp(40px, 10vw + 5vh, 18vh);
-
-  line-height: 1;
-  transform: scaleY(1.9);
-
-  text-align: center;
-  letter-spacing: 0.05em;
 }
 
-.small-timer {
-  height: 15vh;
-  font-size: clamp(30px, 6vw + 3vh, 12vh);
+/* GAME TIMER = 25% of GAME SECTION */
+#gameTimer {
+  font-size: 6em;
+  flex: 0 0 25%;
+}
+
+/* INTERMISSION TIMER = 15% of SECTION */
+#intermissionTimer {
+  font-size: 3.75em;
+  flex: 0 0 15%;
 }
 
 /* ROWS */
@@ -89,10 +76,10 @@ h1, h2 {
   width: 100%;
 }
 
-/* BUTTONS + DROPDOWNS (ALL GREY) */
+/* BUTTONS + DROPDOWNS */
 button, select {
   font-family: 'Roboto';
-  padding: 5px;
+  padding: 10px;
   border-radius: 8px;
   border: none;
   background: #666;
@@ -104,7 +91,6 @@ button, select {
   min-width: 55px;
 }
 
-/* SVG ICONS */
 button svg {
   width: 18px;
   height: 18px;
@@ -112,17 +98,18 @@ button svg {
 }
 
 button.active {
+  border: 2px solid #00ff00;
   color: #00ff00;
 }
 
-/* INTERMISSION BUTTON SCALE (60% width feel maintained via row) */
+/* INTERMISSION BUTTON SCALE */
 .intermission .row {
   width: 60%;
 }
 
 /* FOOTER LINKS */
 a {
-  color: rgb(197, 197, 197);
+  color: white;
 }
 </style>
 </head>
@@ -175,7 +162,7 @@ a {
 
   <h2>Intermissions</h2>
 
-  <div id="intermissionTimer" class="timer small-timer">00:00</div>
+  <div id="intermissionTimer" class="timer">00:00</div>
 
   <div class="row">
     <select id="intermissionSelect"></select>
@@ -205,18 +192,10 @@ a {
 </div>
 
 <div class="section footer">
-  <div><a href="#">Instructions</a></div>
   <div>acamapps v1.0</div>
 </div>
 
 <script>
-
-/* FULLSCREEN AUTO REQUEST */
-function goFullScreen() {
-  let el = document.documentElement;
-  if (el.requestFullscreen) el.requestFullscreen();
-}
-document.addEventListener("click", goFullScreen, { once: true });
 
 /* DROPDOWNS */
 for (let i=0;i<=30;i++){
@@ -241,9 +220,8 @@ let gameSeconds=0, gameInterval=null, countUp=true;
 function updateGame(){
   let m=Math.floor(gameSeconds/60);
   let s=gameSeconds%60;
-  gameTimer.textContent=
-    String(m).padStart(2,'0')+":"+
-    String(s).padStart(2,'0');
+  gameTimer.textContent =
+    String(m).padStart(2,'0')+":"+String(s).padStart(2,'0');
 }
 
 function startGame(){
@@ -295,9 +273,8 @@ let played2=false, played1=false;
 function updateIntermission(){
   let m=Math.floor(intermissionSeconds/60);
   let s=intermissionSeconds%60;
-  intermissionTimer.textContent=
-    String(m).padStart(2,'0')+":"+
-    String(s).padStart(2,'0');
+  intermissionTimer.textContent =
+    String(m).padStart(2,'0')+":"+String(s).padStart(2,'0');
 }
 
 function startIntermission(){
