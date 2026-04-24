@@ -58,25 +58,26 @@ h1, h2 {
   color: #00ff00;
   font-family: 'Orbitron';
 
-  height: 35vh;
+  height: 25vh;
   width: 100%;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  font-size: 30vh;
+  /* 🔥 KEY FIX */
+  font-size: clamp(40px, 10vw + 5vh, 18vh);
 
   line-height: 1;
-  transform: scaleY(0.92); /* tweak to taste */
+  transform: scaleY(1.9);
+
+  text-align: center;
   letter-spacing: 0.05em;
 }
 
-
-
 .small-timer {
-  height: 20vh;
-  font-size: 18vh;
+  height: 15vh;
+  font-size: clamp(30px, 6vw + 3vh, 12vh);
 }
 
 /* ROWS */
