@@ -1,1 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timer’s Aide</title>
 
+<style>
+/* FONTS */
+@font-face {
+  font-family: 'Orbitron';
+  src: url('fonts/Orbitron-Regular.ttf');
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url('fonts/Roboto-Regular.ttf');
+}
+
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* SECTIONS */
+.section {
+  width: 95%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* HEIGHTS */
+.header { height: 10%; background: black; color: white; }
+.game { height: 45%; background: #0b4dbf; color: white; }
+.intermission { height: 25%; background: white; color: black; }
+.sirens { height: 10%; background: red; color: white; }
+.footer { height: 10%; background: black; color: white; }
+
+/* HEADINGS */
+h1, h2 {
+  font-family: 'Orbitron';
+  margin: 5px;
+}
+
+/* TIMER DISPLAY */
+.timer {
+  background: black;
+  color: #00ff00;
+  font-family: 'Orbitron';
+  font-size: 4em;
+  padding: 10px 20px;
+  border-radius: 8px;
+}
+
+.small-timer {
+  font-size: 2.5em;
+}
+
+/* BUTTON ROWS */
+.row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+/* BUTTON STYLE */
+button, select {
+  font-family: 'Roboto';
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #222;
+  color: white;
+  cursor: pointer;
+}
+
+button.active {
+  color: #00ff00;
+}
+
+/* INTERMISSION BUTTON ROW WIDTH */
+.intermission .row {
+  width: 60%;
+}
+
+/* LINKS */
+a {
+  color: white;
+  text-decoration: underline;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="section header">
+  <h1>Footy Timer</h1>
+</div>
+
+<!-- GAME TIME -->
+<div class="section game">
+
+  <h2>Game Time</h2>
+
+  <!-- QUARTERS -->
+  <div class="row">
+    <button onclick="selectQuarter(this)">Q1</button>
+    <button onclick="selectQuarter(this)">Q2</button>
+    <button onclick="selectQuarter(this)">Q3</button>
+    <button onclick="selectQuarter(this)">Q4</button>
+  </div>
+
+  <!-- TIMER -->
+  <div id="gameTimer" class="timer">00:00</div>
+
+  <!-- LABELS -->
+  <div class="row">
+    <span>Count</span>
+    <span>Mins</span>
+    <span>Reset</span>
+    <span>Run</span>
+    <span>Pause</span>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="row">
+    <button onclick="toggleDirection()" id="directionBtn">Up</button>
+
+    <select id="minutesSelect">
+      <script>
+        for (let i = 0; i <= 30; i++) {
+          document.write(`<option value="${i}">${i}</option>`);
+        }
+      </script>
+    </select>
+
+    <button onclick="resetGame()">■</button>
+    <button onclick="startGame()">▶</button>
+    <button onclick="pauseGame()">❚❚</button>
+  </div>
+
+</div>
+
+<!-- INTERMISSION -->
+<div class="section intermission">
+
+  <h2>Intermissions</h2>
+
+  <div id="intermissionTimer" class="timer small-timer">00:00</div>
+
+  <div class="row">
+    <select id="intermissionSelect">
+      <script>
+        for (let i = 0; i <= 20; i++) {
+          document.write(`<option value="${i}">${i}</option>`);
+        }
+      </script>
+    </select>
+
+    <button onclick="resetIntermission()">■</button>
+    <button onclick="startIntermission()">▶</button>
+  </div>
+
+</div>
+
+<!-- SIRENS -->
+<div class="section sirens">
+
+  <h2>Sirens</h2>
+
+  <div class="row">
+    <button onclick="playSiren('full.mp3')">Full</button>
+    <button onclick="playSiren('twomin.mp3')">2-min</button>
+    <button onclick="playSiren('onemin.mp3')">1-min</button>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="section footer">
+  <div><a href="#">Instructions</a></div>
+  <div>acamapps v1.0</div>
+</div>
+
+<script>
+/* GAME TIMER */
+let gameSeconds = 0;
+let gameInterval = null;
+let countUp = true;
+
+function updateGameDisplay() {
+  let mins = Math.floor(gameSeconds / 60);
+  let secs = gameSeconds % 60;
+  document.getElementById("gameTimer").textContent =
+    String(mins).padStart(2, '0') + ":" +
+    String(secs).padStart(2, '0');
+}
+
+function startGame() {
+  if (gameInterval) return;
+  gameInterval = setInterval(() => {
+    gameSeconds += countUp ? 1 : -1;
+    if (gameSeconds < 0) gameSeconds = 0;
+    updateGameDisplay();
+  }, 1000);
+}
+
+function pauseGame() {
+  clearInterval(gameInterval);
+  gameInterval = null;
+}
+
+function resetGame() {
+  let mins = parseInt(document.getElementById("minutesSelect").value);
+  gameSeconds = mins * 60;
+  updateGameDisplay();
+}
+
+function toggleDirection() {
+  countUp = !countUp;
+  document.getElementById("directionBtn").textContent = countUp ? "Up" : "Down";
+}
+
+/* INTERMISSION TIMER */
+let intermissionSeconds = 0;
+let intermissionInterval = null;
+
+function updateIntermissionDisplay() {
+  let mins = Math.floor(intermissionSeconds / 60);
+  let secs = intermissionSeconds % 60;
+  document.getElementById("intermissionTimer").textContent =
+    String(mins).padStart(2, '0') + ":" +
+    String(secs).padStart(2, '0');
+}
+
+function startIntermission() {
+  if (intermissionInterval) return;
+  intermissionInterval = setInterval(() => {
+    intermissionSeconds--;
+    if (intermissionSeconds <= 0) {
+      intermissionSeconds = 0;
+      clearInterval(intermissionInterval);
+      intermissionInterval = null;
+    }
+    updateIntermissionDisplay();
+  }, 1000);
+}
+
+function resetIntermission() {
+  let mins = parseInt(document.getElementById("intermissionSelect").value);
+  intermissionSeconds = mins * 60;
+  updateIntermissionDisplay();
+}
+
+/* QUARTERS */
+function selectQuarter(btn) {
+  document.querySelectorAll(".game button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+/* SIRENS */
+function playSiren(file) {
+  let audio = new Audio("sirens/" + file);
+  audio.play();
+}
+</script>
+
+</body>
+</html>
