@@ -91,6 +91,26 @@ h1, h2 {
   color: red !important;
 }
 
+.timer-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.direction-indicator {
+  position: fixed;
+  left: 2vw;              /* anchored to left of screen */
+  
+  font-family: 'Orbitron';
+  font-size: 2vh;         /* smaller size */
+  color: #00ff00;
+
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+
+  pointer-events: none;
+  z-index: 10;
+}
+
 /* BUTTONS */
 .button-row {
   display: flex;
@@ -165,7 +185,10 @@ a {
 </div>
 
 <div class="row game-timer">
-  <div id="gameTimer" class="timer">00:00</div>
+  <div class="timer-wrapper">
+    <div id="directionIndicator" class="direction-indicator">UP</div>
+    <div id="gameTimer" class="timer">00:00</div>
+  </div>
 </div>
 
 <div class="row game-controls">
@@ -240,6 +263,8 @@ const intermissionSelect = document.getElementById("intermissionSelect");
 const gameTimer = document.getElementById("gameTimer");
 const intermissionTimer = document.getElementById("intermissionTimer");
 const directionBtn = document.getElementById("directionBtn");
+
+const directionIndicator = document.getElementById("directionIndicator");
 
 /* =========================
    CENTRAL RULE (NEW)
@@ -330,6 +355,7 @@ function startGame(){
 function loopGame(){
   if (gameState !== "RUNNING") return;
   updateGame();
+  positionDirectionIndicator(); 
   requestAnimationFrame(loopGame);
 }
 
@@ -360,12 +386,22 @@ function toggleDirection(){
 
   countUp = !countUp;
   directionBtn.textContent = countUp ? "⬆️" : "⬇️";
+
+  directionIndicator.textContent = countUp ? "UP" : "DOWN";
 }
 
 function applyMinutes(){
   if (!isGameEditable()) return;
 
   gameBaseSeconds = parseInt(minutesSelect.value || 0) * 60;
+}
+
+function positionDirectionIndicator() {
+  const rect = gameTimer.getBoundingClientRect();
+  const centreY = rect.top + rect.height / 2;
+
+  directionIndicator.style.top = centreY + "px";
+  directionIndicator.style.transform = "translateY(-50%)";
 }
 
 /* =========================
@@ -474,7 +510,9 @@ function selectQuarter(btn){
 /* INIT */
 updateGame();
 updateIntermission();
-
+directionIndicator.textContent = countUp ? "UP" : "DOWN";
+positionDirectionIndicator();
+window.addEventListener("resize", positionDirectionIndicator);
 </script>
 
 </body>
