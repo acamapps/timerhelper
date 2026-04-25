@@ -22,9 +22,6 @@ body {
   background: black;
   font-family: 'Roboto';
   user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  -webkit-touch-callout: none;
 }
 
 /* CONTAINER */
@@ -65,9 +62,6 @@ h1, h2 {
   margin: 0;
 }
 
-h1 { font-size: 4vh; }
-h2 { font-size: 3vh; }
-
 .timer {
   font-family: 'Orbitron';
   color: #00ff00;
@@ -76,10 +70,6 @@ h2 { font-size: 3vh; }
 
 .small-timer {
   font-size: 6vh;
-}
-
-#intermissionTimer {
-  color: #00ff00;
 }
 
 .timer.warning {
@@ -102,7 +92,6 @@ button, select {
   border-radius: 1vh;
   min-height: 4vh;
   font-size: 3vh;
-  text-align: center;
   background: #b1b1b1;
 }
 
@@ -112,26 +101,17 @@ button {
   justify-content: center;
 }
 
-button svg {
-  width: 40%;
-  height: 40%;
-  fill: currentColor;
+/* ACTIVE QUARTER */
+button.active {
+  border: 0.4vh solid #00ff00;
+  color: #00ff00;
 }
 
-/* COLOURS */
+/* BUTTON COLORS */
 .play-btn { background: #C2FFA3 !important; }
 .intermission-play-btn { background: #C2FFA3 !important; }
 .pause-btn { background: #FFE599 !important; }
 .reset-btn { background: #FF9999 !important; }
-
-/* PRESS EFFECT */
-button {
-  transition: transform 0.08s ease, filter 0.08s ease;
-}
-button:active {
-  transform: scale(0.92);
-  filter: brightness(0.8);
-}
 
 a {
   color: rgb(66, 160, 186);
@@ -163,12 +143,15 @@ a {
 
 <div class="row game-controls">
   <div class="button-row">
+
     <button onclick="toggleDirection()" id="directionBtn">⬆️</button>
-    <select id="minutesSelect"></select>
+
+    <select id="minutesSelect" onchange="applyMinutes()"></select>
 
     <button class="reset-btn" onclick="resetGame()">set</button>
     <button class="play-btn" onclick="startGame()">run</button>
     <button class="pause-btn" onclick="pauseGame()">pause</button>
+
   </div>
 </div>
 
@@ -180,9 +163,11 @@ a {
 
 <div class="row intermission-controls">
   <div class="button-row">
+
     <select id="intermissionSelect"></select>
     <button class="reset-btn" onclick="resetIntermission()">set</button>
     <button class="intermission-play-btn" onclick="startIntermission()">run</button>
+
   </div>
 </div>
 
@@ -206,15 +191,27 @@ a {
 
 <script>
 
+/* =========================
+   FIX: SAFE DOM REFERENCES
+========================= */
+const minutesSelect = document.getElementById("minutesSelect");
+const intermissionSelect = document.getElementById("intermissionSelect");
+const gameTimer = document.getElementById("gameTimer");
+const intermissionTimer = document.getElementById("intermissionTimer");
+const directionBtn = document.getElementById("directionBtn");
+
 /* DROPDOWNS */
 for (let i=0;i<=30;i++){
   let o=document.createElement("option");
-  o.value=i;o.textContent=i;
+  o.value=i;
+  o.textContent=i;
   minutesSelect.appendChild(o);
 }
+
 for (let i=0;i<=20;i++){
   let o=document.createElement("option");
-  o.value=i;o.textContent=i;
+  o.value=i;
+  o.textContent=i;
   intermissionSelect.appendChild(o);
 }
 
@@ -224,55 +221,56 @@ function playSiren(file){
 }
 
 /* =========================
-   GAME TIMER (PERSISTENT)
+   GAME TIMER
 ========================= */
 
 let gameStartTime = null;
 let gamePausedAt = null;
 let gamePausedTotal = 0;
 let gameRunning = false;
+
 let countUp = true;
+let gameBaseSeconds = 0;
 
 function getGameSeconds(){
   if (!gameStartTime) return 0;
 
   let now = gameRunning ? Date.now() : (gamePausedAt || Date.now());
-  let elapsed = now - gameStartTime - gamePausedTotal;
-  return Math.floor(elapsed / 1000);
+  return Math.floor((now - gameStartTime - gamePausedTotal) / 1000);
 }
 
 function updateGame(){
-  let gameSeconds = getGameSeconds();
 
-  let m = Math.floor(gameSeconds / 60);
-  let s = gameSeconds % 60;
+  const elapsed = getGameSeconds();
+
+  let displaySeconds = countUp
+    ? gameBaseSeconds + elapsed
+    : Math.max(gameBaseSeconds - elapsed, 0);
+
+  let m = Math.floor(displaySeconds / 60);
+  let s = displaySeconds % 60;
 
   gameTimer.textContent =
     String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
 
-  if(!countUp && gameSeconds <= 60){
-    gameTimer.classList.add("warning");
-  } else {
-    gameTimer.classList.remove("warning");
-  }
+  gameTimer.classList.toggle("warning", !countUp && displaySeconds <= 60);
 }
 
 function startGame(){
-  if (gameRunning) return;
-
   const now = Date.now();
 
   if (!gameStartTime) {
     gameStartTime = now;
-  } else if (gamePausedAt) {
+    gamePausedTotal = 0;
+    playSiren("siren.mp3");
+  }
+
+  if (gamePausedAt) {
     gamePausedTotal += now - gamePausedAt;
     gamePausedAt = null;
   }
 
   gameRunning = true;
-
-  playSiren("siren.mp3");
-
   requestAnimationFrame(loopGame);
 }
 
@@ -289,33 +287,49 @@ function pauseGame(){
   gameRunning = false;
 }
 
+/* RESET ALWAYS UNBLOCKED */
 function resetGame(){
+
   gameStartTime = null;
   gamePausedAt = null;
   gamePausedTotal = 0;
   gameRunning = false;
 
-  gameTimer.textContent = "00:00";
+  gameBaseSeconds = parseInt(minutesSelect.value || 0) * 60;
+
+  updateGame();
+}
+
+function toggleDirection(){
+  countUp = !countUp;
+  directionBtn.textContent = countUp ? "⬆️" : "⬇️";
+}
+
+function applyMinutes(){
+  gameBaseSeconds = parseInt(minutesSelect.value || 0) * 60;
 }
 
 /* =========================
-   INTERMISSION (PERSISTENT)
+   INTERMISSION
 ========================= */
 
 let interStartTime = null;
 let interPausedAt = null;
 let interPausedTotal = 0;
 let interRunning = false;
+let interDuration = 0;
 
 function getInterSeconds(){
-  if (!interStartTime) return 0;
+  if (!interStartTime) return interDuration;
 
   let now = interRunning ? Date.now() : (interPausedAt || Date.now());
-  let elapsed = now - interStartTime - interPausedTotal;
-  return Math.floor(elapsed / 1000);
+  let elapsed = Math.floor((now - interStartTime - interPausedTotal) / 1000);
+
+  return Math.max(interDuration - elapsed, 0);
 }
 
 function updateIntermission(){
+
   let interSeconds = getInterSeconds();
 
   let m = Math.floor(interSeconds / 60);
@@ -324,11 +338,7 @@ function updateIntermission(){
   intermissionTimer.textContent =
     String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
 
-  if(interSeconds <= 60){
-    intermissionTimer.classList.add("warning");
-  } else {
-    intermissionTimer.classList.remove("warning");
-  }
+  intermissionTimer.classList.toggle("warning", interSeconds <= 60);
 }
 
 function startIntermission(){
@@ -344,7 +354,6 @@ function startIntermission(){
   }
 
   interRunning = true;
-
   requestAnimationFrame(loopIntermission);
 }
 
@@ -355,29 +364,36 @@ function loopIntermission(){
 }
 
 function resetIntermission(){
+
+  interDuration = parseInt(intermissionSelect.value || 0) * 60;
+
   interStartTime = null;
   interPausedAt = null;
   interPausedTotal = 0;
   interRunning = false;
 
-  intermissionTimer.classList.remove("warning");
-  intermissionTimer.textContent = "00:00";
+  updateIntermission();
 }
 
 /* QUARTERS */
 function selectQuarter(btn){
+
+  // If already selected → turn it off
   if (btn.classList.contains("active")) {
     btn.classList.remove("active");
     return;
   }
 
+  // Otherwise clear others and select this one
   document.querySelectorAll(".quarters button")
     .forEach(b => b.classList.remove("active"));
 
   btn.classList.add("active");
 }
 
-directionBtn.textContent = "⬆️";
+/* INIT */
+updateGame();
+updateIntermission();
 
 </script>
 
