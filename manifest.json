@@ -1,6 +1,6 @@
 {
-  "name": "Footy Timer's Helper",
-  "short_name": "Footy Timing",
+  "name": "Footy Timer",
+  "short_name": "Footy Timer",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#000000",
