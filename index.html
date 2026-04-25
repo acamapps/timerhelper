@@ -2,25 +2,8 @@
 <html lang="en">
 <head>
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-BW3QPXB7QC"></script>
-<script>
-  window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-BW3QPXB7QC');
-</script>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Footy Timer's Helper">
-<meta name="theme-color" content="#000000">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 
 <title>Timer’s Aide</title>
 
@@ -36,183 +19,224 @@
 
 body {
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+  background: black;
   font-family: 'Roboto';
+  user-select: none;
 }
 
-/* SECTIONS */
-.section {
+/* CONTAINER */
+.container {
+  width: 95vw;
+  height: 100vh;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ROWS */
+.row {
   width: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: space-evenly;
-  text-align: center;
+  justify-content: center;
 }
 
-/* HEIGHTS */
-.header { height: 10vh; background: black; color: white; }
-.game { height: 35vh; background: #0b4dbf; color: white; }
-.intermission { height: 25vh; background: white; color: black; }
-.sirens { height: 10vh; background: red; color: white; }
-.footer { height: 10vh; background: black; color: rgb(84, 84, 84); }
+/* HEIGHT SYSTEM */
+.header { height: 8vh; background: black; color: white; }
+.game-title { height: 6vh; background: #0b4dbf; color: white; }
+.quarters { height: 8vh; background: #0b4dbf; }
+.game-timer { height: 18vh; background: #0b4dbf; }
+.game-controls { height: 10vh; background: #0b4dbf; }
 
-/* HEADINGS */
+.intermission-title { height: 6vh; background: white; }
+.intermission-timer { height: 14vh; background: white; }
+.intermission-controls { height: 10vh; background: white; }
+
+.sirens-title { height: 6vh; background: red; color: white; }
+.sirens-controls { height: 8vh; background: red; }
+
+.footer { height: 6vh; background: black; color: grey; }
+
+/* TEXT */
 h1, h2 {
   font-family: 'Orbitron';
   margin: 0;
 }
 
-/* TIMERS (NO BACKGROUND NOW) */
+h1 { font-size: 4vh; }
+h2 { font-size: 3vh; }
+
+/* TIMERS */
 .timer {
   font-family: 'Orbitron';
   color: #00ff00;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 10vh;
 }
 
-/* GAME TIMER = 25% of GAME SECTION */
-#gameTimer {
-  font-size: 6em;
-  flex: 0 0 30%;
+.small-timer {
+  font-size: 6vh;
 }
 
-/* INTERMISSION TIMER = 15% of SECTION */
 #intermissionTimer {
-  font-size: 3.75em;
-  flex: 0 0 20%;
-}
-
-/* ROWS */
-.row {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-/* BUTTONS + DROPDOWNS */
-button, select {
-  font-family: 'Roboto';
-  padding: 5px;
-  border-radius: 10px;
-  border: none;
-  background: #b1b1b1;
-  color: rgb(0, 0, 0);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 70px;
-}
-
-button svg {
-  width: 25px;
-  height: 25px;
-  fill: rgb(0, 0, 0);
-}
-
-button.active {
-  border: 3px solid #00ff00;
   color: #00ff00;
 }
 
-/* INTERMISSION BUTTON SCALE */
-.intermission .row {
-  width: 60%;
+.timer.warning {
+  color: red !important;
+  /* text-shadow: 0 0 10px rgba(255,0,0,0.8); */
 }
 
-/* FOOTER LINKS */
+/* BUTTON ROWS */
+.button-row {
+  display: flex;
+  justify-content: center;   /* centres buttons */
+  align-items: center;
+  gap: 1vh;
+  width: 100%;
+}
+
+/* BUTTONS */
+button, select {
+  flex: 1;
+  max-width: 12vh;
+  border: none;
+  border-radius: 1vh;
+  min-height: 4vh;
+  font-size: 3vh;
+  text-align: center;
+  background: #b1b1b1;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ACTIVE QUARTER */
+button.active {
+  border: 0.4vh solid #00ff00;
+  color: #00ff00;
+}
+
+/* SVG */
+button svg {
+  width: 40%;
+  height: 40%;
+  fill: currentColor;
+}
+
+.play-btn {
+  background: #C2FFA3 !important; /* light green */
+}
+
+.intermission-play-btn {
+  background: #C2FFA3 !important;
+}
+
+.pause-btn {
+  background: #FFE599 !important; /* orange */
+}
+
+.reset-btn {
+  background: #FF9999 !important; /* red */
+}
+
+.intermission-reset-btn {
+  background: #FF9999 !important;
+}
+
+/* LINKS */
 a {
   color: rgb(66, 160, 186);
+  font-size: 2vh;
 }
 </style>
 </head>
 
 <body>
 
-<div class="section header">
+<div class="container">
+
+<!-- HEADER -->
+<div class="row header">
   <h1>Footy Timer</h1>
 </div>
 
 <!-- GAME -->
-<div class="section game">
+<div class="row game-title"><h2>Game Time</h2></div>
 
-  <h2>Game Time</h2>
-
-  <div class="row">
+<div class="row quarters">
+  <div class="button-row">
     <button onclick="selectQuarter(this)">Q1</button>
     <button onclick="selectQuarter(this)">Q2</button>
     <button onclick="selectQuarter(this)">Q3</button>
     <button onclick="selectQuarter(this)">Q4</button>
   </div>
+</div>
 
+<div class="row game-timer">
   <div id="gameTimer" class="timer">00:00</div>
+</div>
 
-  <div class="row">
-    <button onclick="toggleDirection()" id="directionBtn">Up</button>
-
+<div class="row game-controls">
+  <div class="button-row">
+    <button onclick="toggleDirection()" id="directionBtn">⬆️</button>
     <select id="minutesSelect"></select>
 
-    <button onclick="resetGame()">
-      <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"/></svg>
+<button class="reset-btn" onclick="resetGame()">
+  set
+</button>
+
+    <button class="play-btn" onclick="startGame()">
+      run
     </button>
 
-    <button onclick="startGame()">
-      <svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
-    </button>
-
-    <button onclick="pauseGame()">
-      <svg viewBox="0 0 24 24">
-        <rect x="6" y="5" width="4" height="14"/>
-        <rect x="14" y="5" width="4" height="14"/>
-      </svg>
+    <button class="pause-btn" onclick="pauseGame()">
+      pause
     </button>
   </div>
-
 </div>
 
 <!-- INTERMISSION -->
-<div class="section intermission">
+<div class="row intermission-title"><h2>Intermissions</h2></div>
 
-  <h2>Intermissions</h2>
+<div class="row intermission-timer">
+  <div id="intermissionTimer" class="timer small-timer">00:00</div>
+</div>
 
-  <div id="intermissionTimer" class="timer">00:00</div>
-
-  <div class="row">
+<div class="row intermission-controls">
+  <div class="button-row">
     <select id="intermissionSelect"></select>
 
-    <button onclick="resetIntermission()">
-      <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"/></svg>
+    <button class="reset-btn" onclick="resetIntermission()">
+      set
     </button>
 
-    <button onclick="startIntermission()">
-      <svg viewBox="0 0 24 24"><polygon points="8,5 19,12 8,19"/></svg>
+    <button class="intermission-play-btn" onclick="startIntermission()">
+      run
     </button>
   </div>
-
 </div>
 
 <!-- SIRENS -->
-<div class="section sirens">
+<div class="row sirens-title"><h2>Sirens</h2></div>
 
-  <h2>Sirens</h2>
-
-  <div class="row">
+<div class="row sirens-controls">
+  <div class="button-row">
     <button onclick="playSiren('siren.mp3')">Full</button>
     <button onclick="playSiren('twomin.mp3')">2-min</button>
     <button onclick="playSiren('onemin.mp3')">1-min</button>
   </div>
-
 </div>
 
-<div class="section footer">
-  <div><a href="instructions.html">instructions</a></div>
-  <div>acamapps v1.0</div>
+<!-- FOOTER -->
+<div class="row footer">
+  <div>
+    <a href="instructions.html">instructions</a> | acamapps v1.0
+  </div>
+</div>
+
 </div>
 
 <script>
@@ -238,10 +262,18 @@ function playSiren(file){
 let gameSeconds=0, gameInterval=null, countUp=true;
 
 function updateGame(){
-  let m=Math.floor(gameSeconds/60);
-  let s=gameSeconds%60;
+  let m = Math.floor(gameSeconds / 60);
+  let s = gameSeconds % 60;
+
   gameTimer.textContent =
-    String(m).padStart(2,'0')+":"+String(s).padStart(2,'0');
+    String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
+
+  // 🔴 WARNING STATE (ONLY WHEN COUNTING DOWN)
+  if(!countUp && gameSeconds <= 60){
+    gameTimer.classList.add("warning");
+  } else {
+    gameTimer.classList.remove("warning");
+  }
 }
 
 function startGame(){
@@ -277,13 +309,13 @@ function pauseGame(){
 function resetGame(){
   clearInterval(gameInterval);
   gameInterval=null;
-  gameSeconds=minutesSelect.value*60;
+  gameSeconds=parseInt(minutesSelect.value || 0)*60;
   updateGame();
 }
 
 function toggleDirection(){
   countUp=!countUp;
-  directionBtn.textContent=countUp?"Up":"Down";
+  directionBtn.textContent=countUp?"⬆️":"⬇️";
 }
 
 /* INTERMISSION */
@@ -291,10 +323,17 @@ let intermissionSeconds=0, intermissionInterval=null;
 let played2=false, played1=false;
 
 function updateIntermission(){
-  let m=Math.floor(intermissionSeconds/60);
-  let s=intermissionSeconds%60;
+  let m = Math.floor(intermissionSeconds / 60);
+  let s = intermissionSeconds % 60;
+
   intermissionTimer.textContent =
-    String(m).padStart(2,'0')+":"+String(s).padStart(2,'0');
+    String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
+
+  if(intermissionSeconds <= 60){
+    intermissionTimer.classList.add("warning");
+  } else {
+    intermissionTimer.classList.remove("warning");
+  }
 }
 
 function startIntermission(){
@@ -325,22 +364,30 @@ function startIntermission(){
 
 function resetIntermission(){
   clearInterval(intermissionInterval);
-  intermissionInterval=null;
+  intermissionInterval = null;
 
-  intermissionSeconds=intermissionSelect.value*60;
+  intermissionSeconds = parseInt(intermissionSelect.value || 0) * 60;
 
-  played2=false;
-  played1=false;
+  played2 = false;
+  played1 = false;
+
+  // 🔴 IMPORTANT: force remove red state on reset
+  intermissionTimer.classList.remove("warning");
 
   updateIntermission();
 }
 
 /* QUARTERS */
 function selectQuarter(btn){
-  document.querySelectorAll(".game button")
+  document.querySelectorAll(".quarters button")
     .forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
 }
+
+/* INIT */
+directionBtn.textContent = "⬆️";
+updateGame();
+updateIntermission();
 
 </script>
 
