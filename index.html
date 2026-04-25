@@ -24,7 +24,6 @@ body {
   user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
-  user-select: none;
   -webkit-touch-callout: none;
 }
 
@@ -61,7 +60,6 @@ body {
 
 .footer { height: 6vh; background: black; color: grey; }
 
-/* TEXT */
 h1, h2 {
   font-family: 'Orbitron';
   margin: 0;
@@ -70,7 +68,6 @@ h1, h2 {
 h1 { font-size: 4vh; }
 h2 { font-size: 3vh; }
 
-/* TIMERS */
 .timer {
   font-family: 'Orbitron';
   color: #00ff00;
@@ -87,19 +84,17 @@ h2 { font-size: 3vh; }
 
 .timer.warning {
   color: red !important;
-  /* text-shadow: 0 0 10px rgba(255,0,0,0.8); */
 }
 
-/* BUTTON ROWS */
+/* BUTTONS */
 .button-row {
   display: flex;
-  justify-content: center;   /* centres buttons */
+  justify-content: center;
   align-items: center;
   gap: 1vh;
   width: 100%;
 }
 
-/* BUTTONS */
 button, select {
   flex: 1;
   max-width: 12vh;
@@ -117,49 +112,27 @@ button {
   justify-content: center;
 }
 
-/* ACTIVE QUARTER */
-button.active {
-  border: 0.4vh solid #00ff00;
-  color: #00ff00;
-}
-
-/* SVG */
 button svg {
   width: 40%;
   height: 40%;
   fill: currentColor;
 }
 
-.play-btn {
-  background: #C2FFA3 !important; /* light green */
-}
+/* COLOURS */
+.play-btn { background: #C2FFA3 !important; }
+.intermission-play-btn { background: #C2FFA3 !important; }
+.pause-btn { background: #FFE599 !important; }
+.reset-btn { background: #FF9999 !important; }
 
-.intermission-play-btn {
-  background: #C2FFA3 !important;
-}
-
-.pause-btn {
-  background: #FFE599 !important; /* orange */
-}
-
-.reset-btn {
-  background: #FF9999 !important; /* red */
-}
-
-.intermission-reset-btn {
-  background: #FF9999 !important;
-}
-
+/* PRESS EFFECT */
 button {
   transition: transform 0.08s ease, filter 0.08s ease;
 }
-
 button:active {
   transform: scale(0.92);
   filter: brightness(0.8);
 }
 
-/* LINKS */
 a {
   color: rgb(66, 160, 186);
   font-size: 2vh;
@@ -171,12 +144,8 @@ a {
 
 <div class="container">
 
-<!-- HEADER -->
-<div class="row header">
-  <h1>Footy Timer</h1>
-</div>
+<div class="row header"><h1>Footy Timer</h1></div>
 
-<!-- GAME -->
 <div class="row game-title"><h2>Game Time</h2></div>
 
 <div class="row quarters">
@@ -197,21 +166,12 @@ a {
     <button onclick="toggleDirection()" id="directionBtn">⬆️</button>
     <select id="minutesSelect"></select>
 
-<button class="reset-btn" onclick="resetGame()">
-  set
-</button>
-
-    <button class="play-btn" onclick="startGame()">
-      run
-    </button>
-
-    <button class="pause-btn" onclick="pauseGame()">
-      pause
-    </button>
+    <button class="reset-btn" onclick="resetGame()">set</button>
+    <button class="play-btn" onclick="startGame()">run</button>
+    <button class="pause-btn" onclick="pauseGame()">pause</button>
   </div>
 </div>
 
-<!-- INTERMISSION -->
 <div class="row intermission-title"><h2>Intermissions</h2></div>
 
 <div class="row intermission-timer">
@@ -221,18 +181,11 @@ a {
 <div class="row intermission-controls">
   <div class="button-row">
     <select id="intermissionSelect"></select>
-
-    <button class="reset-btn" onclick="resetIntermission()">
-      set
-    </button>
-
-    <button class="intermission-play-btn" onclick="startIntermission()">
-      run
-    </button>
+    <button class="reset-btn" onclick="resetIntermission()">set</button>
+    <button class="intermission-play-btn" onclick="startIntermission()">run</button>
   </div>
 </div>
 
-<!-- SIRENS -->
 <div class="row sirens-title"><h2>Sirens</h2></div>
 
 <div class="row sirens-controls">
@@ -243,7 +196,6 @@ a {
   </div>
 </div>
 
-<!-- FOOTER -->
 <div class="row footer">
   <div>
     <a href="instructions.html">instructions</a> | acamapps v1.0
@@ -271,17 +223,33 @@ function playSiren(file){
   new Audio("sirens/"+file).play();
 }
 
-/* GAME TIMER */
-let gameSeconds=0, gameInterval=null, countUp=true;
+/* =========================
+   GAME TIMER (PERSISTENT)
+========================= */
+
+let gameStartTime = null;
+let gamePausedAt = null;
+let gamePausedTotal = 0;
+let gameRunning = false;
+let countUp = true;
+
+function getGameSeconds(){
+  if (!gameStartTime) return 0;
+
+  let now = gameRunning ? Date.now() : (gamePausedAt || Date.now());
+  let elapsed = now - gameStartTime - gamePausedTotal;
+  return Math.floor(elapsed / 1000);
+}
 
 function updateGame(){
+  let gameSeconds = getGameSeconds();
+
   let m = Math.floor(gameSeconds / 60);
   let s = gameSeconds % 60;
 
   gameTimer.textContent =
     String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
 
-  // 🔴 WARNING STATE (ONLY WHEN COUNTING DOWN)
   if(!countUp && gameSeconds <= 60){
     gameTimer.classList.add("warning");
   } else {
@@ -290,59 +258,73 @@ function updateGame(){
 }
 
 function startGame(){
-  if(gameInterval) return;
+  if (gameRunning) return;
+
+  const now = Date.now();
+
+  if (!gameStartTime) {
+    gameStartTime = now;
+  } else if (gamePausedAt) {
+    gamePausedTotal += now - gamePausedAt;
+    gamePausedAt = null;
+  }
+
+  gameRunning = true;
 
   playSiren("siren.mp3");
 
-  gameInterval=setInterval(()=>{
-    gameSeconds+=countUp?1:-1;
+  requestAnimationFrame(loopGame);
+}
 
-    if(!countUp && gameSeconds<=0){
-      gameSeconds=0;
-      updateGame();
-      clearInterval(gameInterval);
-      gameInterval=null;
-
-      playSiren("siren.mp3");
-
-      resetIntermission();
-      startIntermission();
-      return;
-    }
-
-    updateGame();
-  },1000);
+function loopGame(){
+  if (!gameRunning) return;
+  updateGame();
+  requestAnimationFrame(loopGame);
 }
 
 function pauseGame(){
-  clearInterval(gameInterval);
-  gameInterval=null;
+  if (!gameRunning) return;
+
+  gamePausedAt = Date.now();
+  gameRunning = false;
 }
 
 function resetGame(){
-  clearInterval(gameInterval);
-  gameInterval=null;
-  gameSeconds=parseInt(minutesSelect.value || 0)*60;
-  updateGame();
+  gameStartTime = null;
+  gamePausedAt = null;
+  gamePausedTotal = 0;
+  gameRunning = false;
+
+  gameTimer.textContent = "00:00";
 }
 
-function toggleDirection(){
-  countUp=!countUp;
-  directionBtn.textContent=countUp?"⬆️":"⬇️";
-}
+/* =========================
+   INTERMISSION (PERSISTENT)
+========================= */
 
-/* INTERMISSION */
-let intermissionSeconds=0, intermissionInterval=null;
-let played2=false, played1=false;
+let interStartTime = null;
+let interPausedAt = null;
+let interPausedTotal = 0;
+let interRunning = false;
+
+function getInterSeconds(){
+  if (!interStartTime) return 0;
+
+  let now = interRunning ? Date.now() : (interPausedAt || Date.now());
+  let elapsed = now - interStartTime - interPausedTotal;
+  return Math.floor(elapsed / 1000);
+}
 
 function updateIntermission(){
-  let m = Math.floor(intermissionSeconds / 60);
-  let s = intermissionSeconds % 60;
+  let interSeconds = getInterSeconds();
+
+  let m = Math.floor(interSeconds / 60);
+  let s = interSeconds % 60;
 
   intermissionTimer.textContent =
     String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
 
-  if(intermissionSeconds <= 60){
+  if(interSeconds <= 60){
     intermissionTimer.classList.add("warning");
   } else {
     intermissionTimer.classList.remove("warning");
@@ -350,44 +332,36 @@ function updateIntermission(){
 }
 
 function startIntermission(){
-  if(intermissionInterval) return;
+  if (interRunning) return;
 
-  intermissionInterval=setInterval(()=>{
-    intermissionSeconds--;
+  const now = Date.now();
 
-    if(intermissionSeconds===120 && !played2){
-      playSiren("twomin.mp3");
-      played2=true;
-    }
+  if (!interStartTime) {
+    interStartTime = now;
+  } else if (interPausedAt) {
+    interPausedTotal += now - interPausedAt;
+    interPausedAt = null;
+  }
 
-    if(intermissionSeconds===60 && !played1){
-      playSiren("onemin.mp3");
-      played1=true;
-    }
+  interRunning = true;
 
-    if(intermissionSeconds<=0){
-      intermissionSeconds=0;
-      clearInterval(intermissionInterval);
-      intermissionInterval=null;
-    }
+  requestAnimationFrame(loopIntermission);
+}
 
-    updateIntermission();
-  },1000);
+function loopIntermission(){
+  if (!interRunning) return;
+  updateIntermission();
+  requestAnimationFrame(loopIntermission);
 }
 
 function resetIntermission(){
-  clearInterval(intermissionInterval);
-  intermissionInterval = null;
+  interStartTime = null;
+  interPausedAt = null;
+  interPausedTotal = 0;
+  interRunning = false;
 
-  intermissionSeconds = parseInt(intermissionSelect.value || 0) * 60;
-
-  played2 = false;
-  played1 = false;
-
-  // 🔴 IMPORTANT: force remove red state on reset
   intermissionTimer.classList.remove("warning");
-
-  updateIntermission();
+  intermissionTimer.textContent = "00:00";
 }
 
 /* QUARTERS */
@@ -403,10 +377,7 @@ function selectQuarter(btn){
   btn.classList.add("active");
 }
 
-/* INIT */
 directionBtn.textContent = "⬆️";
-updateGame();
-updateIntermission();
 
 </script>
 
