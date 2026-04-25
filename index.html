@@ -116,6 +116,9 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform 0.05s ease, filter 0.05s ease, box-shadow 0.05s ease;
+  box-shadow: 0 0.6vh 0 rgba(0,0,0,0.4);
+  touch-action: manipulation;
 }
 
 /* ACTIVE QUARTER */
@@ -126,8 +129,9 @@ button.active {
 
 /* BUTTON PRESS ANIMATION (RESTORED) */
 button:active {
-  transform: scale(0.92);
-  filter: brightness(0.8);
+  transform: translateY(0.6vh);
+  box-shadow: 0 0vh 0 rgba(0,0,0,0.4);
+  filter: brightness(0.7);
 }
 
 /* BUTTON COLORS */
@@ -216,6 +220,13 @@ a {
 ========================= */
 let gameState = "IDLE"; // IDLE | RUNNING | PAUSED
 
+let gameEnded = false;
+
+let twoMinPlayed = false;
+let oneMinPlayed = false;
+
+let lastInterSeconds = null;
+
 let gameStartTime = null;
 let gamePausedAt = null;
 let gamePausedTotal = 0;
@@ -281,6 +292,17 @@ function updateGame(){
     String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
 
   gameTimer.classList.toggle("warning", !countUp && displaySeconds <= 60);
+
+  /* ✅ BULLETPROOF GAME END */
+  if (!countUp && displaySeconds <= 0 && !gameEnded) {
+    gameEnded = true;
+
+    playSiren("siren.mp3");
+
+    gameState = "PAUSED";
+
+    startIntermission();
+  }
 }
 
 /* RUN = START OR RESUME */
@@ -320,7 +342,7 @@ function pauseGame(){
 
 /* RESET */
 function resetGame(){
-
+  gameEnded = false;
   gameState = "IDLE";
 
   gameStartTime = null;
@@ -376,6 +398,26 @@ function updateIntermission(){
     String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
 
   intermissionTimer.classList.toggle("warning", interSeconds <= 60);
+
+  /* ✅ BULLETPROOF THRESHOLD CROSSING */
+
+  if (lastInterSeconds !== null) {
+
+    // crossed DOWN through 120
+    if (lastInterSeconds > 120 && interSeconds <= 120 && !twoMinPlayed) {
+      twoMinPlayed = true;
+      playSiren("twomin.mp3");
+    }
+
+    // crossed DOWN through 60
+    if (lastInterSeconds > 60 && interSeconds <= 60 && !oneMinPlayed) {
+      oneMinPlayed = true;
+      playSiren("onemin.mp3");
+    }
+
+  }
+
+  lastInterSeconds = interSeconds;
 }
 
 function startIntermission(){
@@ -401,6 +443,9 @@ function loopIntermission(){
 }
 
 function resetIntermission(){
+  twoMinPlayed = false;
+  oneMinPlayed = false;
+  lastInterSeconds = null;
 
   interDuration = parseInt(intermissionSelect.value || 0) * 60;
 
