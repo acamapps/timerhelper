@@ -9,7 +9,7 @@ const FILES_TO_CACHE = [
   "./icon-512.png",
   "./fonts/Orbitron-Bold.woff2",
   "./fonts/Roboto-Bold.woff2"
-  "./sirens/full.mp3",
+  "./sirens/siren.mp3",
   "./sirens/twomin.mp3",
   "./sirens/onemin.mp3",
 ];
