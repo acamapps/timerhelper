@@ -24,7 +24,6 @@ body {
   user-select: none;
 }
 
-/* CONTAINER */
 .container {
   width: 95vw;
   height: 100vh;
@@ -33,7 +32,6 @@ body {
   flex-direction: column;
 }
 
-/* ROWS */
 .row {
   width: 100%;
   display: flex;
@@ -94,7 +92,7 @@ button, select {
   font-size: 3vh;
   background: #b1b1b1;
   text-align: center;
-  text-align-last: center; /* important for iOS/Safari */
+  text-align-last: center; /* important for Safari/iOS */
 }
 
 button {
@@ -107,6 +105,12 @@ button {
 button.active {
   border: 0.4vh solid #00ff00;
   color: #00ff00;
+}
+
+/* BUTTON PRESS ANIMATION (RESTORED) */
+button:active {
+  transform: scale(0.92);
+  filter: brightness(0.8);
 }
 
 /* BUTTON COLORS */
@@ -194,26 +198,41 @@ a {
 <script>
 
 /* =========================
-   FIX: SAFE DOM REFERENCES
+   STATE
 ========================= */
+let gameState = "IDLE"; // IDLE | RUNNING | PAUSED
+
+let gameStartTime = null;
+let gamePausedAt = null;
+let gamePausedTotal = 0;
+
+let countUp = true;
+let gameBaseSeconds = 0;
+
+/* ELEMENTS */
 const minutesSelect = document.getElementById("minutesSelect");
 const intermissionSelect = document.getElementById("intermissionSelect");
 const gameTimer = document.getElementById("gameTimer");
 const intermissionTimer = document.getElementById("intermissionTimer");
 const directionBtn = document.getElementById("directionBtn");
 
+/* =========================
+   CENTRAL RULE (NEW)
+========================= */
+function isGameEditable(){
+  return gameState === "IDLE";
+}
+
 /* DROPDOWNS */
 for (let i=0;i<=30;i++){
   let o=document.createElement("option");
-  o.value=i;
-  o.textContent=i;
+  o.value=i; o.textContent=i;
   minutesSelect.appendChild(o);
 }
 
 for (let i=0;i<=20;i++){
   let o=document.createElement("option");
-  o.value=i;
-  o.textContent=i;
+  o.value=i; o.textContent=i;
   intermissionSelect.appendChild(o);
 }
 
@@ -226,18 +245,10 @@ function playSiren(file){
    GAME TIMER
 ========================= */
 
-let gameStartTime = null;
-let gamePausedAt = null;
-let gamePausedTotal = 0;
-let gameRunning = false;
-
-let countUp = true;
-let gameBaseSeconds = 0;
-
 function getGameSeconds(){
   if (!gameStartTime) return 0;
 
-  let now = gameRunning ? Date.now() : (gamePausedAt || Date.now());
+  let now = gameState === "RUNNING" ? Date.now() : (gamePausedAt || Date.now());
   return Math.floor((now - gameStartTime - gamePausedTotal) / 1000);
 }
 
@@ -258,61 +269,71 @@ function updateGame(){
   gameTimer.classList.toggle("warning", !countUp && displaySeconds <= 60);
 }
 
+/* RUN = START OR RESUME */
 function startGame(){
+
   const now = Date.now();
 
-  if (!gameStartTime) {
+  if (gameState === "IDLE") {
     gameStartTime = now;
     gamePausedTotal = 0;
     playSiren("siren.mp3");
   }
 
-  if (gamePausedAt) {
+  if (gameState === "PAUSED") {
     gamePausedTotal += now - gamePausedAt;
     gamePausedAt = null;
   }
 
-  gameRunning = true;
+  if (gameState === "RUNNING") return;
+
+  gameState = "RUNNING";
   requestAnimationFrame(loopGame);
 }
 
 function loopGame(){
-  if (!gameRunning) return;
+  if (gameState !== "RUNNING") return;
   updateGame();
   requestAnimationFrame(loopGame);
 }
 
 function pauseGame(){
-  if (!gameRunning) return;
+  if (gameState !== "RUNNING") return;
 
   gamePausedAt = Date.now();
-  gameRunning = false;
+  gameState = "PAUSED";
 }
 
-/* RESET ALWAYS UNBLOCKED */
+/* RESET */
 function resetGame(){
+
+  gameState = "IDLE";
 
   gameStartTime = null;
   gamePausedAt = null;
   gamePausedTotal = 0;
-  gameRunning = false;
 
   gameBaseSeconds = parseInt(minutesSelect.value || 0) * 60;
 
   updateGame();
 }
 
+/* CONTROL RULES (CENTRALISED) */
 function toggleDirection(){
+  if (!isGameEditable()) return;
+
   countUp = !countUp;
   directionBtn.textContent = countUp ? "⬆️" : "⬇️";
 }
 
 function applyMinutes(){
+  if (!isGameEditable()) return;
+
   gameBaseSeconds = parseInt(minutesSelect.value || 0) * 60;
 }
 
 /* =========================
-   INTERMISSION
+   INTERMISSION (UNCHANGED)
 ========================= */
 
 let interStartTime = null;
@@ -380,13 +401,11 @@ function resetIntermission(){
 /* QUARTERS */
 function selectQuarter(btn){
 
-  // If already selected → turn it off
   if (btn.classList.contains("active")) {
     btn.classList.remove("active");
     return;
   }
 
-  // Otherwise clear others and select this one
   document.querySelectorAll(".quarters button")
     .forEach(b => b.classList.remove("active"));
 
