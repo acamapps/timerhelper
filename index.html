@@ -261,12 +261,13 @@
     function unlockAudio() {
       if (audioUnlocked) return;
 
-      Object.values(AudioEngine.sounds).forEach(a => {
-        a.play().then(() => {
-          a.pause();
-          a.currentTime = 0;
+      try {
+         const silent = new Audio("data:audio/mp3;base64,//uQZAAAAAAAAAAAA");
+        silent.volume = 0;
+        silent.play().then(() => {
+          silent.pause();
         }).catch(() => {});
-      });
+      } catch (e) {}
 
       audioUnlocked = true;
     }
@@ -287,15 +288,15 @@
       const a = this.sounds[name];
       if (!a || !audioUnlocked) return;
 
-      try {
-        a.pause();
-        a.currentTime = 0;
+      a.pause();
+      a.currentTime = 0;
 
+      setTimeout(() => {
         const p = a.play();
         if (p && typeof p.catch === "function") {
           p.catch(() => {});
         }
-      } catch (e) {}
+      }, 0);
     };
 
     function isGameEditable(){
