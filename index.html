@@ -261,13 +261,22 @@
     function unlockAudio() {
       if (audioUnlocked) return;
 
-      const silent = new Audio();
-      silent.src =
-        "data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAA";
+      Object.values(AudioEngine.sounds).forEach(a => {
+        a.muted = true;
 
-      silent.play().then(() => {
-        silent.pause();
-      }).catch(() => {});
+        const p = a.play();
+        if (p && typeof p.then === "function") {
+          p.then(() => {
+            a.pause();
+          a.currentTime = 0;
+            a.muted = false;   // restore sound AFTER priming
+          }).catch(() => {
+            a.muted = false;
+          });
+        } else {
+          a.muted = false;
+        }
+      });
 
       audioUnlocked = true;
     }
