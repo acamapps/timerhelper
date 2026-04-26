@@ -439,6 +439,13 @@
       const now = Date.now();
 
       if (!interStartTime) {
+        // 🔥 RESET FLAGS ON NEW INTERMISSION
+        twoMinPlayed = false;
+        oneMinPlayed = false;
+
+        // 🔥 ENSURE DURATION IS SET
+        interDuration = parseInt(intermissionSelect.value || 0) * 60;
+
         interStartTime = now;
       } else if (interPausedAt) {
         interPausedTotal += now - interPausedAt;
