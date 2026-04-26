@@ -273,19 +273,6 @@ function isGameEditable(){
   return gameState === "IDLE";
 }
 
-/* DROPDOWNS */
-for (let i=0;i<=30;i++){
-  let o=document.createElement("option");
-  o.value=i; o.textContent=i;
-  minutesSelect.appendChild(o);
-}
-
-for (let i=0;i<=20;i++){
-  let o=document.createElement("option");
-  o.value=i; o.textContent=i;
-  intermissionSelect.appendChild(o);
-}
-
 /* AUDIO */
 const sirens = {
   full: new Audio("sirens/siren.mp3"),
@@ -311,7 +298,7 @@ function unlockAudio(){
   if (audioUnlocked) return;
 
   Object.values(sirens).forEach(s => {
-    s.muted = true;           // 🔑 KEY TRICK
+    s.muted = true;
     s.play().then(() => {
       s.pause();
       s.currentTime = 0;
@@ -320,6 +307,19 @@ function unlockAudio(){
   });
 
   audioUnlocked = true;
+}
+
+/* DROPDOWNS */
+for (let i=0;i<=30;i++){
+  let o=document.createElement("option");
+  o.value=i; o.textContent=i;
+  minutesSelect.appendChild(o);
+}
+
+for (let i=0;i<=20;i++){
+  let o=document.createElement("option");
+  o.value=i; o.textContent=i;
+  intermissionSelect.appendChild(o);
 }
 
 /* =========================
@@ -456,6 +456,10 @@ function updateIntermission(){
 
   let interSeconds = getInterSeconds();
 
+  if (lastInterSeconds === null) {
+    lastInterSeconds = interSeconds;
+  }
+
   let m = Math.floor(interSeconds / 60);
   let s = interSeconds % 60;
 
@@ -464,22 +468,17 @@ function updateIntermission(){
 
   intermissionTimer.classList.toggle("warning", interSeconds <= 60);
 
-  /* ✅ BULLETPROOF THRESHOLD CROSSING */
+  if (lastInterSeconds > interSeconds) {
 
-  if (lastInterSeconds !== null) {
-
-    // crossed DOWN through 120
-    if (lastInterSeconds >= 121 && interSeconds <= 120 && !twoMinPlayed) {
+    if (lastInterSeconds > 120 && interSeconds <= 120 && !twoMinPlayed) {
       twoMinPlayed = true;
       playSiren("two");
     }
 
-    // crossed DOWN through 60
-    if (lastInterSeconds >= 61 && interSeconds <= 60 && !oneMinPlayed) {
+    if (lastInterSeconds > 60 && interSeconds <= 60 && !oneMinPlayed) {
       oneMinPlayed = true;
       playSiren("one");
     }
-
   }
 
   lastInterSeconds = interSeconds;
@@ -487,13 +486,14 @@ function updateIntermission(){
 
 function startIntermission(){
   unlockAudio();
+
   if (interRunning) return;
 
   const now = Date.now();
 
   if (!interStartTime) {
+    interDuration = parseInt(intermissionSelect.value || 0) * 60;
     interStartTime = now;
-
     lastInterSeconds = interDuration;
   } 
   else if (interPausedAt) {
