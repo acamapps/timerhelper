@@ -371,16 +371,21 @@ function updateGame(){
   gameTimer.classList.toggle("warning", !countUp && displaySeconds <= 60);
 
   /* ✅ BULLETPROOF GAME END */
-  if (!countUp) {
-    if (displaySeconds <= 0 && !gameEnded) {
-      gameEnded = true;
+if (!countUp) {
+  if (displaySeconds <= 0 && !gameEnded) {
+    gameEnded = true;
 
-      playSiren("full");
+    playSiren("full");
 
-      gameState = "PAUSED";
+    gameState = "PAUSED";
 
-      startIntermission();
-    }
+    interDuration = parseInt(intermissionSelect.value || 0) * 60;
+
+    lastInterSeconds = null;
+    twoMinPlayed = false;
+    oneMinPlayed = false;
+
+    startIntermission();
   }
 }
 
@@ -516,11 +521,23 @@ function updateIntermission(){
   lastInterSeconds = interSeconds;
 }
 
+function initIntermissionState() {
+  interDuration = parseInt(intermissionSelect.value || 0) * 60;
+
+  const nowSeconds = getInterSeconds();
+
+  lastInterSeconds = nowSeconds;
+  twoMinPlayed = false;
+  oneMinPlayed = false;
+
+  // force display refresh immediately
+  updateIntermission();
+}
+
 function startIntermission(){
   unlockAudio();
 
   if (!interStartTime) {
-    interDuration = parseInt(intermissionSelect.value || 0) * 60;
     interStartTime = Date.now();
   }
 
@@ -531,13 +548,16 @@ function startIntermission(){
 
   interRunning = true;
 
-  // 🔥 CRITICAL FIX: ALWAYS RESET THRESHOLD TRACKING
+  initIntermissionState(); // MUST set interDuration + reset thresholds
+
+  // 🔥 IMPORTANT: set baseline BEFORE loop starts
   lastInterSeconds = getInterSeconds();
   twoMinPlayed = false;
   oneMinPlayed = false;
 
   requestAnimationFrame(loopIntermission);
 }
+
 function loopIntermission(){
   if (!interRunning) return;
   updateIntermission();
