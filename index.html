@@ -458,8 +458,9 @@ function applyMinutes(){
   if (!isGameEditable()) return;
 
   gameBaseSeconds = parseInt(minutesSelect.value || 0) * 60;
-}
 
+  updateGame(); // 🔥 force visual update immediately
+}
 function positionDirectionIndicator() {
   const rect = gameTimer.getBoundingClientRect();
   const centreY = rect.top + rect.height / 2;
@@ -535,14 +536,15 @@ function startIntermission(){
 
   const now = Date.now();
 
-  // ALWAYS set duration first
+  // ALWAYS define duration first
   interDuration = parseInt(intermissionSelect.value || 0) * 60;
 
-  // start time logic
+  // FIRST START ONLY
   if (!interStartTime) {
     interStartTime = now;
   }
 
+  // RESUME CASE
   if (interPausedAt) {
     interPausedTotal += now - interPausedAt;
     interPausedAt = null;
@@ -550,9 +552,8 @@ function startIntermission(){
 
   interRunning = true;
 
-  // 🔥 CRITICAL FIX: align baseline with REAL computed value
-  lastInterSeconds = getInterSeconds();
-
+  // 🔥 CRITICAL: stable baseline for threshold detection
+  lastInterSeconds = interDuration;
   twoMinPlayed = false;
   oneMinPlayed = false;
 
