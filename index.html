@@ -379,8 +379,6 @@ function updateGame(){
 
       gameState = "PAUSED";
 
-      interDuration = parseInt(intermissionSelect.value || 0) * 60;
-
       lastInterSeconds = null;
       twoMinPlayed = false;
       oneMinPlayed = false;
@@ -487,6 +485,8 @@ function getInterSeconds(){
 
 function updateIntermission(){
 
+  if (!interRunning) return;
+
   let interSeconds = getInterSeconds();
 
   if (lastInterSeconds === null) {
@@ -533,21 +533,26 @@ function initIntermissionState() {
 function startIntermission(){
   unlockAudio();
 
+  const now = Date.now();
+
+  // ALWAYS set duration first
+  interDuration = parseInt(intermissionSelect.value || 0) * 60;
+
+  // start time logic
   if (!interStartTime) {
-    interStartTime = Date.now();
+    interStartTime = now;
   }
 
   if (interPausedAt) {
-    interPausedTotal += Date.now() - interPausedAt;
+    interPausedTotal += now - interPausedAt;
     interPausedAt = null;
   }
 
   interRunning = true;
 
-  initIntermissionState(); // MUST set interDuration + reset thresholds
-
-  // 🔥 IMPORTANT: set baseline BEFORE loop starts
+  // 🔥 CRITICAL FIX: align baseline with REAL computed value
   lastInterSeconds = getInterSeconds();
+
   twoMinPlayed = false;
   oneMinPlayed = false;
 
