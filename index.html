@@ -405,14 +405,18 @@
     }
 
     function updateIntermission(){
-      console.log("interSeconds:", interSeconds);
       let interSeconds = getInterSeconds();
 
       let m = Math.floor(interSeconds / 60);
       let s = interSeconds % 60;
 
+      /* ACTUAL, not 3 line version below
       intermissionTimer.textContent =
-        String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
+      String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0'); */
+      
+      intermissionTimer.textContent =
+        String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0') + 
+        " [" + interSeconds + "]";
 
       intermissionTimer.classList.toggle("warning", interSeconds <= 60);
 
@@ -442,6 +446,7 @@
       }
 
       interRunning = true;
+      updateIntermission(); 
       requestAnimationFrame(loopIntermission);
     }
 
