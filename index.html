@@ -1,4 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BW3QPXB7QC"></script>
+<script>
+  window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-BW3QPXB7QC');
+</script>
+  
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bulldogs Scoring & Timing">
+<meta name="theme-color" content="#000000">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+<title>Footy Timer</title>
+
+<style>
+@font-face {
+  font-family: 'Orbitron';
+  src: url('fonts/Orbitron-Bold.woff2');
+}
+@font-face {
+  font-family: 'Roboto';
+  src: url('fonts/Roboto-Bold.woff2');
+}
+
+body {
+  margin: 0;
+  background: black;
+  font-family: 'Roboto';
+  user-select: none;
+}
+
+.container {
+  width: 95vw;
+  height: 100vh;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* HEIGHT SYSTEM */
+.header { height: 8vh; background: black; color: white; }
+.game-title { height: 6vh; background: #0b4dbf; color: white; }
+.quarters { height: 8vh; background: #0b4dbf; }
+.game-timer { height: 18vh; background: #0b4dbf; }
+.game-controls { height: 10vh; background: #0b4dbf; }
+
+.intermission-title { height: 6vh; background: white; }
+.intermission-timer { height: 14vh; background: white; }
+.intermission-controls { height: 10vh; background: white; }
+
+.sirens-title { height: 6vh; background: red; color: white; }
+.sirens-controls { height: 8vh; background: red; }
+
+.footer { height: 6vh; background: black; color: grey; }
+
+h1, h2 {
+  font-family: 'Orbitron';
+  margin: 0;
+}
+
+.timer {
+  font-family: 'Orbitron';
+  color: #00ff00;
+  font-size: 10vh;
+}
+
+.small-timer {
+  font-size: 6vh;
+}
+
+.timer.warning {
+  color: red !important;
+}
+
+.timer-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.direction-indicator {
+  position: fixed;
+  left: 2vw;              /* anchored to left of screen */
+  
+  font-family: 'Orbitron';
+  font-size: 2vh;         /* smaller size */
+  color: #00ff00;
+
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* BUTTONS */
+.button-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1vh;
+  width: 100%;
+}
+
+button, select {
+  flex: 1;
+  max-width: 12vh;
+  border: none;
+  border-radius: 1vh;
+  min-height: 4vh;
+  font-size: 3vh;
+  background: #b1b1b1;
+  text-align: center;
+  text-align-last: center; /* important for Safari/iOS */
+}
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.05s ease, filter 0.05s ease, box-shadow 0.05s ease;
+  box-shadow: 0 0.6vh 0 rgba(0,0,0,0.4);
+  touch-action: manipulation;
+}
+
+/* ACTIVE QUARTER */
+button.active {
+  border: 0.4vh solid #00ff00;
+  color: #00ff00;
+}
+
+/* BUTTON PRESS ANIMATION (RESTORED) */
+button:active {
+  transform: translateY(0.6vh);
+  box-shadow: 0 0vh 0 rgba(0,0,0,0.4);
+  filter: brightness(0.7);
+}
+
+/* BUTTON COLORS */
+.play-btn { background: #C2FFA3 !important; }
+.intermission-play-btn { background: #C2FFA3 !important; }
+.pause-btn { background: #FFE599 !important; }
+.reset-btn { background: #FF9999 !important; }
+
+a {
+  color: rgb(66, 160, 186);
+  font-size: 2vh;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="row header"><h1>Footy Timer</h1></div>
+
+<div class="row game-title"><h2>Game Time</h2></div>
+
+<div class="row quarters">
+  <div class="button-row">
+    <button onclick="selectQuarter(this)">Q1</button>
+    <button onclick="selectQuarter(this)">Q2</button>
+    <button onclick="selectQuarter(this)">Q3</button>
+    <button onclick="selectQuarter(this)">Q4</button>
+  </div>
+</div>
+
+<div class="row game-timer">
+  <div class="timer-wrapper">
+    <div id="directionIndicator" class="direction-indicator">UP</div>
+    <div id="gameTimer" class="timer">00:00</div>
+  </div>
+</div>
+
+<div class="row game-controls">
+  <div class="button-row">
+    <select id="minutesSelect" onchange="applyMinutes()"></select>
+    <button onclick="toggleDirection()" id="directionBtn">⬆️</button>
+    <button class="reset-btn" onclick="resetGame()">set</button>
+    <button class="play-btn" onclick="startGame()">run</button>
+    <button class="pause-btn" onclick="pauseGame()">pause</button>
+
+  </div>
+</div>
+
+<div class="row intermission-title"><h2>Intermissions</h2></div>
+
+<div class="row intermission-timer">
+  <div id="intermissionTimer" class="timer small-timer">00:00</div>
+</div>
+
+<div class="row intermission-controls">
+  <div class="button-row">
+
+    <select id="intermissionSelect"></select>
+    <button class="reset-btn" onclick="resetIntermission()">set</button>
+    <button class="intermission-play-btn" onclick="startIntermission()">run</button>
+
+  </div>
+</div>
+
+<div class="row sirens-title"><h2>Sirens</h2></div>
+
+<div class="row sirens-controls">
+  <div class="button-row">
+    <button onclick="playSiren('full')">Full</button>
+    <button onclick="playSiren('two')">2-min</button>
+    <button onclick="playSiren('one')">1-min</button>
+  </div>
+</div>
+
+<div class="row footer">
+  <div>
+    <a href="instructions.html">instructions</a> | acamapps v1.02
+  </div>
+</div>
+
+</div>
+
+<script>
+
+/* =========================
+   STATE
+========================= */
+let gameState = "IDLE"; // IDLE | RUNNING | PAUSED
+
+let gameEnded = false;
+
+let twoMinPlayed = false;
+let oneMinPlayed = false;
+
+let lastInterSeconds = null;
+
+let gameStartTime = null;
+let gamePausedAt = null;
+let gamePausedTotal = 0;
+
+let countUp = true;
+let gameBaseSeconds = 0;
+
+/* ELEMENTS */
+const minutesSelect = document.getElementById("minutesSelect");
+const intermissionSelect = document.getElementById("intermissionSelect");
+const gameTimer = document.getElementById("gameTimer");
+const intermissionTimer = document.getElementById("intermissionTimer");
+const directionBtn = document.getElementById("directionBtn");
+
+const directionIndicator = document.getElementById("directionIndicator");
+
+/* =========================
+   CENTRAL RULE (NEW)
+========================= */
+function isGameEditable(){
+  return gameState === "IDLE";
+}
+
+/* AUDIO */
+const sirens = {
+  full: new Audio("sirens/siren.mp3"),
+  two: new Audio("sirens/twomin.mp3"),
+  one: new Audio("sirens/onemin.mp3")
+};
+
 Object.values(sirens).forEach(s => {
   s.preload = "auto";
   s.load();
 });
+
+function playSiren(type){
+  const sound = sirens[type];
+  if (!sound) return;
+
+  sound.currentTime = 0;
+  sound.play().catch(()=>{});
+}
+
+let audioUnlocked = false;
+
+let audioContext;
+
+function unlockAudio(){
+  if (audioUnlocked) return;
+
+  try {
+    audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
+    audioContext.resume?.();
+  } catch (e) {}
+
+  const testSound = sirens.full;
+
+  const p = testSound.play();
+
+  if (p !== undefined) {
+    p.then(() => {
+      testSound.pause();
+      testSound.currentTime = 0;
+      audioUnlocked = true;
+    }).catch(() => {
+      // don't lie about success
+      audioUnlocked = false;
+    });
+  }
+}
+
+function unlockAudioOnce(){
+  unlockAudio();
+  window.removeEventListener("touchstart", unlockAudioOnce);
+  window.removeEventListener("click", unlockAudioOnce);
+}
+
+window.addEventListener("touchstart", unlockAudioOnce, { once: true });
+window.addEventListener("click", unlockAudioOnce, { once: true });
+
+/* DROPDOWNS */
+for (let i=0;i<=30;i++){
+  let o=document.createElement("option");
+  o.value=i; o.textContent=i;
+  minutesSelect.appendChild(o);
+}
+
+for (let i=0;i<=20;i++){
+  let o=document.createElement("option");
+  o.value=i; o.textContent=i;
+  intermissionSelect.appendChild(o);
+}
+
+/* =========================
+   GAME TIMER
+========================= */
+
+function getGameSeconds(){
+  if (!gameStartTime) return 0;
+
+  let now = gameState === "RUNNING" ? Date.now() : (gamePausedAt || Date.now());
+  return Math.floor((now - gameStartTime - gamePausedTotal) / 1000);
+}
+
+function updateGame(){
+
+  const elapsed = getGameSeconds();
+
+  let displaySeconds = countUp
+    ? gameBaseSeconds + elapsed
+    : Math.max(gameBaseSeconds - elapsed, 0);
+
+  let m = Math.floor(displaySeconds / 60);
+  let s = displaySeconds % 60;
+
+  gameTimer.textContent =
+    String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
+
+  gameTimer.classList.toggle("warning", !countUp && displaySeconds <= 60);
+
+  /* ✅ BULLETPROOF GAME END */
+  if (!countUp) {
+    if (displaySeconds <= 0 && !gameEnded) {
+      gameEnded = true;
+
+      playSiren("full");
+
+      gameState = "PAUSED";
+
+      startIntermission();
+    }
+  }
+}
+
+/* RUN = START OR RESUME */
+function startGame(){
+
+  unlockAudio(); 
+  const now = Date.now();
+
+  if (gameState === "IDLE") {
+    gameStartTime = now;
+    gamePausedTotal = 0;
+  }
+
+  if (gameState === "PAUSED") {
+    gamePausedTotal += now - gamePausedAt;
+    gamePausedAt = null;
+  }
+
+  if (gameState === "RUNNING") return;
+
+  gameState = "RUNNING";
+
+  requestAnimationFrame(() => {
+    if (gameState === "RUNNING") {
+      playSiren("full");
+    }
+  });
+
+  requestAnimationFrame(loopGame);
+}
+
+function loopGame(){
+  if (gameState !== "RUNNING") return;
+  updateGame();
+  positionDirectionIndicator(); 
+  requestAnimationFrame(loopGame);
+}
+
+function pauseGame(){
+  if (gameState !== "RUNNING") return;
+
+  gamePausedAt = Date.now();
+  gameState = "PAUSED";
+}
+
+/* RESET */
+function resetGame(){
+  gameEnded = false;
+  gameState = "IDLE";
+
+  gameStartTime = null;
+  gamePausedAt = null;
+  gamePausedTotal = 0;
+
+  gameBaseSeconds = parseInt(minutesSelect.value || 0) * 60;
+
+  updateGame();
+  directionIndicator.textContent = countUp ? "UP" : "DOWN";
+}
+
+/* CONTROL RULES (CENTRALISED) */
+function toggleDirection(){
+  if (!isGameEditable()) return;
+
+  countUp = !countUp;
+  directionBtn.textContent = countUp ? "⬆️" : "⬇️";
+}
+
+function applyMinutes(){
+  if (!isGameEditable()) return;
+
+  gameBaseSeconds = parseInt(minutesSelect.value || 0) * 60;
+}
+
+function positionDirectionIndicator() {
+  const rect = gameTimer.getBoundingClientRect();
+  const centreY = rect.top + rect.height / 2;
+
+  directionIndicator.style.top = centreY + "px";
+  directionIndicator.style.transform = "translateY(-50%)";
+}
+
+let interStartTime = null;
+let interPausedAt = null;
+let interPausedTotal = 0;
+let interRunning = false;
+let interDuration = 0;
+
+function getInterSeconds(){
+  if (!interStartTime) return interDuration;
+
+  let now = interRunning ? Date.now() : (interPausedAt || Date.now());
+  let elapsed = Math.floor((now - interStartTime - interPausedTotal) / 1000);
+
+  return Math.max(interDuration - elapsed, 0);
+}
+
+function updateIntermission(){
+
+  let interSeconds = getInterSeconds();
+
+  if (lastInterSeconds === null) {
+    lastInterSeconds = interSeconds;
+  }
+
+  let m = Math.floor(interSeconds / 60);
+  let s = interSeconds % 60;
+
+  intermissionTimer.textContent =
+    String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
+
+  intermissionTimer.classList.toggle("warning", interSeconds <= 60);
+
+  if (lastInterSeconds > interSeconds) {
+
+    if (lastInterSeconds > 120 && interSeconds <= 120 && !twoMinPlayed) {
+      twoMinPlayed = true;
+      playSiren("two");
+    }
+
+    if (lastInterSeconds > 60 && interSeconds <= 60 && !oneMinPlayed) {
+      oneMinPlayed = true;
+      playSiren("one");
+    }
+  }
+
+  lastInterSeconds = interSeconds;
+}
+
+function startIntermission(){
+  unlockAudio();
+
+  if (interRunning) return;
+
+  const now = Date.now();
+
+  if (!interStartTime) {
+    interDuration = parseInt(intermissionSelect.value || 0) * 60;
+    interStartTime = now;
+    lastInterSeconds = interDuration;
+  } 
+  else if (interPausedAt) {
+    interPausedTotal += now - interPausedAt;
+    interPausedAt = null;
+  }
+
+  interRunning = true;
+  requestAnimationFrame(loopIntermission);
+}
+
+function loopIntermission(){
+  if (!interRunning) return;
+  updateIntermission();
+  requestAnimationFrame(loopIntermission);
+}
+
+function resetIntermission(){
+  twoMinPlayed = false;
+  oneMinPlayed = false;
+  lastInterSeconds = null;
+
+  interDuration = parseInt(intermissionSelect.value || 0) * 60;
+
+  interStartTime = null;
+  interPausedAt = null;
+  interPausedTotal = 0;
+  interRunning = false;
+
+  updateIntermission();
+}
+
+/* QUARTERS */
+function selectQuarter(btn){
+
+  if (btn.classList.contains("active")) {
+    btn.classList.remove("active");
+    return;
+  }
+
+  document.querySelectorAll(".quarters button")
+    .forEach(b => b.classList.remove("active"));
+
+  btn.classList.add("active");
+}
+
+/* INIT */
+updateGame();
+updateIntermission();
+directionIndicator.textContent = countUp ? "UP" : "DOWN";
+positionDirectionIndicator();
+window.addEventListener("resize", positionDirectionIndicator);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js');
+}
+  
+</script>
+
+</body>
+</html>
