@@ -486,12 +486,13 @@ function getInterSeconds(){
 
 function updateIntermission(){
 
-  if (!interRunning) return;
+  let interSeconds;
 
-  let interSeconds = getInterSeconds();
-
-  if (lastInterSeconds === null) {
-    lastInterSeconds = interSeconds;
+  // ✅ FIX: if not running, show raw duration
+  if (!interRunning && !interStartTime) {
+    interSeconds = interDuration;
+  } else {
+    interSeconds = getInterSeconds();
   }
 
   let m = Math.floor(interSeconds / 60);
@@ -536,15 +537,12 @@ function startIntermission(){
 
   const now = Date.now();
 
-  // ALWAYS define duration first
   interDuration = parseInt(intermissionSelect.value || 0) * 60;
 
-  // FIRST START ONLY
   if (!interStartTime) {
     interStartTime = now;
   }
 
-  // RESUME CASE
   if (interPausedAt) {
     interPausedTotal += now - interPausedAt;
     interPausedAt = null;
@@ -552,8 +550,8 @@ function startIntermission(){
 
   interRunning = true;
 
-  // 🔥 CRITICAL: stable baseline for threshold detection
-  lastInterSeconds = interDuration;
+  // ✅ correct baseline for detection
+  lastInterSeconds = getInterSeconds();
   twoMinPlayed = false;
   oneMinPlayed = false;
 
