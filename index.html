@@ -415,17 +415,15 @@
 
       intermissionTimer.classList.toggle("warning", interSeconds <= 60);
 
-      if (lastInterSeconds !== null) {
-        if (lastInterSeconds > 120 && interSeconds <= 120 && !twoMinPlayed) {
-          twoMinPlayed = true;
-          AudioEngine.play("twomin");
-        }
-
-        if (lastInterSeconds > 60 && interSeconds <= 60 && !oneMinPlayed) {
-          oneMinPlayed = true;
-          AudioEngine.play("onemin");
-        }
+      if (!twoMinPlayed && interSeconds <= 120) {
+        twoMinPlayed = true;
+        AudioEngine.play("twomin");
       }
+
+      if (!oneMinPlayed && interSeconds <= 60) {
+        oneMinPlayed = true;
+        AudioEngine.play("onemin");
+      }   
 
       lastInterSeconds = interSeconds;
     }
