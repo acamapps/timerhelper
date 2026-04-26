@@ -237,6 +237,7 @@
     let gameEnded = false;
     let twoMinPlayed = false;
     let oneMinPlayed = false;
+    let lastInterSeconds = null;
     let gameStartTime = null;
     let gamePausedAt = null;
     let gamePausedTotal = 0;
@@ -255,6 +256,21 @@
       unlocked: false
     };
 
+    let audioUnlocked = false;
+
+    function unlockAudio() {
+      if (audioUnlocked) return;
+
+      Object.values(AudioEngine.sounds).forEach(a => {
+        a.play().then(() => {
+          a.pause();
+          a.currentTime = 0;
+        }).catch(() => {});
+      });
+
+      audioUnlocked = true;
+    }
+
     AudioEngine.sounds = {
       siren: new Audio("sirens/siren.mp3"),
       twomin: new Audio("sirens/twomin.mp3"),
@@ -269,19 +285,17 @@
     /* 🔊 STEP 5 — PLAY FUNCTION */
     AudioEngine.play = function (name) {
       const a = this.sounds[name];
-      if (!a) return;
+      if (!a || !audioUnlocked) return;
 
       try {
         a.pause();
         a.currentTime = 0;
 
         const p = a.play();
-        if (p !== undefined) {
-          p.catch(err => console.log("Audio blocked:", err));
+        if (p && typeof p.catch === "function") {
+          p.catch(() => {});
         }
-      } catch (e) {
-        console.log("Audio error:", e);
-      }
+      } catch (e) {}
     };
 
     function isGameEditable(){
@@ -397,11 +411,9 @@
     let interDuration = 0;
 
     function getInterSeconds(){
-      if (!interStartTime) return 0;
-
+      if (!interStartTime) return interDuration;
       let now = interRunning ? Date.now() : (interPausedAt || Date.now());
       let elapsed = Math.floor((now - interStartTime - interPausedTotal) / 1000);
-
       return Math.max(interDuration - elapsed, 0);
     }
 
@@ -412,23 +424,19 @@
       let s = interSeconds % 60;
 
       intermissionTimer.textContent =
-          String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0') +
-          " [" + interSeconds + "]" +
-          " RUN=" + interRunning +
-          " START=" + (interStartTime ? "Y" : "N");
+        String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0');
 
       intermissionTimer.classList.toggle("warning", interSeconds <= 60);
 
-      // 🔥 SIREN LOGIC (NO GATING, NO LAST VALUE)
-      if (!twoMinPlayed && interSeconds <= 120) {
+      if (!twoMinPlayed && interSeconds <= 120 && interRunning) {
         twoMinPlayed = true;
-        AudioEngine.play("twomin");
+        setTimeout(() => AudioEngine.play("twomin"), 0);
       }
 
       if (!oneMinPlayed && interSeconds <= 60) {
         oneMinPlayed = true;
-        AudioEngine.play("onemin");
-      }
+        setTimeout(() => AudioEngine.play("onemin"), 0);
+      }   
 
       lastInterSeconds = interSeconds;
     }
@@ -446,7 +454,6 @@
       }
 
       interRunning = true;
-      updateIntermission(); 
       requestAnimationFrame(loopIntermission);
     }
 
@@ -457,22 +464,14 @@
     }
 
     function resetIntermission(){
-      // 🔥 reset siren flags
       twoMinPlayed = false;
       oneMinPlayed = false;
-
-      // 🔥 reset timing state
+      lastInterSeconds = null;
+      interDuration = parseInt(intermissionSelect.value || 0) * 60;
       interStartTime = null;
       interPausedAt = null;
       interPausedTotal = 0;
-
-      // 🔥 stop loop
       interRunning = false;
-
-      // 🔥 recompute duration from dropdown
-      interDuration = parseInt(intermissionSelect.value || 0) * 60;
-
-      // 🔥 update display immediately
       updateIntermission();
     }
 
@@ -499,8 +498,8 @@
       navigator.serviceWorker.register('/service-worker.js');
     }
 
-    document.addEventListener("touchstart", () => AudioEngine.unlock(), { once: true });
-    document.addEventListener("click", () => AudioEngine.unlock(), { once: true });
+    document.addEventListener("touchstart", unlockAudio, { once: true });
+    document.addEventListener("click", unlockAudio, { once: true });
   </script>
 
 </body>
