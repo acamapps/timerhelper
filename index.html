@@ -397,9 +397,11 @@
     let interDuration = 0;
 
     function getInterSeconds(){
-      if (!interStartTime) return interDuration;
+      if (!interStartTime) return 0;
+
       let now = interRunning ? Date.now() : (interPausedAt || Date.now());
       let elapsed = Math.floor((now - interStartTime - interPausedTotal) / 1000);
+
       return Math.max(interDuration - elapsed, 0);
     }
 
