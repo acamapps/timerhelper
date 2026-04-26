@@ -222,15 +222,15 @@ a {
 
 <div class="row sirens-controls">
   <div class="button-row">
-    <button onclick="playSiren('siren.mp3')">Full</button>
-    <button onclick="playSiren('twomin.mp3')">2-min</button>
-    <button onclick="playSiren('onemin.mp3')">1-min</button>
+    <button onclick="playSiren('full')">Full</button>
+    <button onclick="playSiren('two')">2-min</button>
+    <button onclick="playSiren('one')">1-min</button>
   </div>
 </div>
 
 <div class="row footer">
   <div>
-    <a href="instructions.html">instructions</a> | acamapps v1.01
+    <a href="instructions.html">instructions</a> | acamapps v1.02
   </div>
 </div>
 
@@ -266,6 +266,11 @@ const directionBtn = document.getElementById("directionBtn");
 
 const directionIndicator = document.getElementById("directionIndicator");
 
+// Important for iOS
+Object.values(sirens).forEach(s => {
+  s.preload = "auto";
+});
+
 /* =========================
    CENTRAL RULE (NEW)
 ========================= */
@@ -287,8 +292,39 @@ for (let i=0;i<=20;i++){
 }
 
 /* AUDIO */
-function playSiren(file){
-  new Audio("sirens/"+file).play();
+const sirens = {
+  full: new Audio("sirens/siren.mp3"),
+  two: new Audio("sirens/twomin.mp3"),
+  one: new Audio("sirens/onemin.mp3")
+};
+
+Object.values(sirens).forEach(s => {
+  s.preload = "auto";
+});
+
+function playSiren(type){
+  const sound = sirens[type];
+  if (!sound) return;
+
+  sound.currentTime = 0;
+  sound.play().catch(()=>{});
+}
+
+let audioUnlocked = false;
+
+function unlockAudio(){
+  if (audioUnlocked) return;
+
+  Object.values(sirens).forEach(s => {
+    s.muted = true;           // 🔑 KEY TRICK
+    s.play().then(() => {
+      s.pause();
+      s.currentTime = 0;
+      s.muted = false;
+    }).catch(()=>{});
+  });
+
+  audioUnlocked = true;
 }
 
 /* =========================
@@ -323,7 +359,7 @@ function updateGame(){
     if (displaySeconds <= 0 && !gameEnded) {
       gameEnded = true;
 
-      playSiren("siren.mp3");
+      playSiren("full");
 
       gameState = "PAUSED";
 
@@ -335,12 +371,13 @@ function updateGame(){
 /* RUN = START OR RESUME */
 function startGame(){
 
+  unlockAudio(); 
   const now = Date.now();
 
   if (gameState === "IDLE") {
     gameStartTime = now;
     gamePausedTotal = 0;
-    playSiren("siren.mp3");
+    playSiren("full");
   }
 
   if (gameState === "PAUSED") {
@@ -439,13 +476,13 @@ function updateIntermission(){
     // crossed DOWN through 120
     if (lastInterSeconds >= 121 && interSeconds <= 120 && !twoMinPlayed) {
       twoMinPlayed = true;
-      playSiren("twomin.mp3");
+      playSiren("two");
     }
 
     // crossed DOWN through 60
     if (lastInterSeconds >= 61 && interSeconds <= 60 && !oneMinPlayed) {
       oneMinPlayed = true;
-      playSiren("onemin.mp3");
+      playSiren("one");
     }
 
   }
