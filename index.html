@@ -508,6 +508,11 @@ updateIntermission();
 directionIndicator.textContent = countUp ? "UP" : "DOWN";
 positionDirectionIndicator();
 window.addEventListener("resize", positionDirectionIndicator);
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js');
+}
+  
 </script>
 
 </body>
