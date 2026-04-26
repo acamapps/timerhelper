@@ -237,7 +237,6 @@
     let gameEnded = false;
     let twoMinPlayed = false;
     let oneMinPlayed = false;
-    let lastInterSeconds = null;
     let gameStartTime = null;
     let gamePausedAt = null;
     let gamePausedTotal = 0;
@@ -429,8 +428,6 @@
         oneMinPlayed = true;
         AudioEngine.play("onemin");
       }   
-
-      lastInterSeconds = interSeconds;
     }
 
     function startIntermission(){
@@ -439,13 +436,6 @@
       const now = Date.now();
 
       if (!interStartTime) {
-        // 🔥 RESET FLAGS ON NEW INTERMISSION
-        twoMinPlayed = false;
-        oneMinPlayed = false;
-
-        // 🔥 ENSURE DURATION IS SET
-        interDuration = parseInt(intermissionSelect.value || 0) * 60;
-
         interStartTime = now;
       } else if (interPausedAt) {
         interPausedTotal += now - interPausedAt;
@@ -466,12 +456,15 @@
     function resetIntermission(){
       twoMinPlayed = false;
       oneMinPlayed = false;
-      lastInterSeconds = null;
+
       interDuration = parseInt(intermissionSelect.value || 0) * 60;
+
       interStartTime = null;
       interPausedAt = null;
       interPausedTotal = 0;
+
       interRunning = false;
+
       updateIntermission();
     }
 
