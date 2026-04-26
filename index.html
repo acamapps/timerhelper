@@ -230,7 +230,7 @@ a {
 
 <div class="row footer">
   <div>
-    <a href="instructions.html">instructions</a> | acamapps v1.0
+    <a href="instructions.html">instructions</a> | acamapps v1.01
   </div>
 </div>
 
@@ -319,14 +319,16 @@ function updateGame(){
   gameTimer.classList.toggle("warning", !countUp && displaySeconds <= 60);
 
   /* ✅ BULLETPROOF GAME END */
-  if (!countUp && displaySeconds <= 0 && !gameEnded) {
-    gameEnded = true;
+  if (!countUp) {
+    if (displaySeconds <= 0 && !gameEnded) {
+      gameEnded = true;
 
-    playSiren("siren.mp3");
+      playSiren("siren.mp3");
 
-    gameState = "PAUSED";
+      gameState = "PAUSED";
 
-    startIntermission();
+      startIntermission();
+    }
   }
 }
 
@@ -435,13 +437,13 @@ function updateIntermission(){
   if (lastInterSeconds !== null) {
 
     // crossed DOWN through 120
-    if (lastInterSeconds > 120 && interSeconds <= 120 && !twoMinPlayed) {
+    if (lastInterSeconds >= 121 && interSeconds <= 120 && !twoMinPlayed) {
       twoMinPlayed = true;
       playSiren("twomin.mp3");
     }
 
     // crossed DOWN through 60
-    if (lastInterSeconds > 60 && interSeconds <= 60 && !oneMinPlayed) {
+    if (lastInterSeconds >= 61 && interSeconds <= 60 && !oneMinPlayed) {
       oneMinPlayed = true;
       playSiren("onemin.mp3");
     }
@@ -458,7 +460,10 @@ function startIntermission(){
 
   if (!interStartTime) {
     interStartTime = now;
-  } else if (interPausedAt) {
+
+    lastInterSeconds = interDuration;
+  } 
+  else if (interPausedAt) {
     interPausedTotal += now - interPausedAt;
     interPausedAt = null;
   }
