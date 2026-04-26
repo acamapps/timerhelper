@@ -266,11 +266,6 @@ const directionBtn = document.getElementById("directionBtn");
 
 const directionIndicator = document.getElementById("directionIndicator");
 
-// Important for iOS
-Object.values(sirens).forEach(s => {
-  s.preload = "auto";
-});
-
 /* =========================
    CENTRAL RULE (NEW)
 ========================= */
@@ -491,6 +486,7 @@ function updateIntermission(){
 }
 
 function startIntermission(){
+  unlockAudio();
   if (interRunning) return;
 
   const now = Date.now();
