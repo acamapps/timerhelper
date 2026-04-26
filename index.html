@@ -481,6 +481,11 @@ function getInterSeconds(){
 
 function updateIntermission(){
 
+  if (lastInterSeconds === null) {
+    lastInterSeconds = interSeconds;
+    return;
+  }
+
   let interSeconds = getInterSeconds();
 
   if (lastInterSeconds === null) {
@@ -495,7 +500,7 @@ function updateIntermission(){
 
   intermissionTimer.classList.toggle("warning", interSeconds <= 60);
 
-  if (lastInterSeconds > interSeconds) {
+ if (lastInterSeconds !== null && lastInterSeconds > interSeconds) {
 
     if (lastInterSeconds > 120 && interSeconds <= 120 && !twoMinPlayed) {
       twoMinPlayed = true;
@@ -514,24 +519,25 @@ function updateIntermission(){
 function startIntermission(){
   unlockAudio();
 
-  if (interRunning) return;
-
-  const now = Date.now();
-
   if (!interStartTime) {
     interDuration = parseInt(intermissionSelect.value || 0) * 60;
-    interStartTime = now;
-    lastInterSeconds = interDuration;
-  } 
-  else if (interPausedAt) {
-    interPausedTotal += now - interPausedAt;
+    interStartTime = Date.now();
+  }
+
+  if (interPausedAt) {
+    interPausedTotal += Date.now() - interPausedAt;
     interPausedAt = null;
   }
 
   interRunning = true;
+
+  // 🔥 CRITICAL FIX: ALWAYS RESET THRESHOLD TRACKING
+  lastInterSeconds = getInterSeconds();
+  twoMinPlayed = false;
+  oneMinPlayed = false;
+
   requestAnimationFrame(loopIntermission);
 }
-
 function loopIntermission(){
   if (!interRunning) return;
   updateIntermission();
