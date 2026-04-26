@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
   <!-- Google tag (gtag.js) -->
@@ -261,13 +261,13 @@
     function unlockAudio() {
       if (audioUnlocked) return;
 
-      try {
-         const silent = new Audio("data:audio/mp3;base64,//uQZAAAAAAAAAAAA");
-        silent.volume = 0;
-        silent.play().then(() => {
-          silent.pause();
-        }).catch(() => {});
-      } catch (e) {}
+      const silent = new Audio();
+      silent.src =
+        "data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAAAA";
+
+      silent.play().then(() => {
+        silent.pause();
+      }).catch(() => {});
 
       audioUnlocked = true;
     }
@@ -286,7 +286,7 @@
     /* 🔊 STEP 5 — PLAY FUNCTION */
     AudioEngine.play = function (name) {
       const a = this.sounds[name];
-      if (!a || !audioUnlocked) return;
+      if (!a) return;
 
       a.pause();
       a.currentTime = 0;
