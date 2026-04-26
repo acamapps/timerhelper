@@ -378,6 +378,7 @@ function resetGame(){
   gameBaseSeconds = parseInt(minutesSelect.value || 0) * 60;
 
   updateGame();
+  directionIndicator.textContent = countUp ? "UP" : "DOWN";
 }
 
 /* CONTROL RULES (CENTRALISED) */
@@ -386,8 +387,6 @@ function toggleDirection(){
 
   countUp = !countUp;
   directionBtn.textContent = countUp ? "⬆️" : "⬇️";
-
-  directionIndicator.textContent = countUp ? "UP" : "DOWN";
 }
 
 function applyMinutes(){
@@ -403,10 +402,6 @@ function positionDirectionIndicator() {
   directionIndicator.style.top = centreY + "px";
   directionIndicator.style.transform = "translateY(-50%)";
 }
-
-/* =========================
-   INTERMISSION (UNCHANGED)
-========================= */
 
 let interStartTime = null;
 let interPausedAt = null;
