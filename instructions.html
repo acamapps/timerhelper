@@ -1,14 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BW3QPXB7QC"></script>
+<script>
+  window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-BW3QPXB7QC');
+</script>
+  
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Instructions">
+<meta name="theme-color" content="#000000">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
 <title>Instructions</title>
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-
 <style>
+  @font-face {
+    font-family: 'Orbitron';
+    src: url('fonts/Orbitron-Bold.woff2');
+  }
+  @font-face {
+    font-family: 'Roboto';
+    src: url('fonts/Roboto-Bold.woff2');
+  }
+
   body {
     margin: 0;
     padding: 0;
@@ -19,7 +44,7 @@
   }
 
   header {
-    background: #111;
+    background: #0b4dbf;
     color: white;
     padding: 20px;
     text-align: center;
@@ -59,8 +84,9 @@
   }
 
   .highlight {
-    background: #e8f0ff;
-    border-left: 5px solid #3b82f6;
+    background: #0b4dbf;
+    color: white;
+    border-left: 5px solid red;
     padding: 10px 15px;
     margin: 10px 0;
     border-radius: 6px;
@@ -94,42 +120,73 @@
   <div class="card">
     <h2>Overview</h2>
     <p>
-      This page provides instructions for using the system. Follow the steps carefully to ensure correct operation.
+      Footy Timer is intended to help footy (AFL) timekeepers keep track of when to play sirens.
     </p>
   </div>
 
   <div class="card">
-    <h2>Getting Started</h2>
+    <h2>Quarter Selection</h2>
     <ul>
-      <li>Open the main dashboard.</li>
-      <li>Select the required mode or event.</li>
-      <li>Confirm settings before starting.</li>
+      <li>Tap Q1-4 to highlight it.</li>
+      <li>Tap again to deselect it.</li>
+      <li>This helps keep track of the current quarter.</li>
     </ul>
   </div>
 
   <div class="card">
-    <h2>Controls</h2>
-    <p>Use the on-screen buttons to manage timing, scoring, and navigation.</p>
-
-    <div class="highlight">
-      Tip: Green borders indicate the active selection.
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>Troubleshooting</h2>
+    <h2>Game Time</h2>
+    <p>This is the main timer.</p>
     <ul>
-      <li>If buttons do not respond, refresh the page.</li>
-      <li>Check that all required inputs are set.</li>
-      <li>Ensure you are using a supported browser.</li>
+      <li>Choose the length of the quarter in minutes from the drop down menu.</li>
+      <li>Choose whether the timer counts up or down.</li>
+      <li>Tap set to enter the time and direction.</li>
+      <div class="highlight">
+        NOTE: Selections only become active when set is pressed.
+      </div>
+      <li>Tap run to begin the timer.</li>
+      <li>When the the timer reaches zero the siren will sound.</li> 
+      <li>The intermission timer will AUTOMATICALLY begin.</li>    
+        <div class="highlight">
+          Tip: make sure the intermission timer has been set!
+        </div>
     </ul>
   </div>
 
   <div class="card">
-    <h2>Notes</h2>
+    <h2>Intermissions</h2>
+    <ul>
+      <li>Set the duration of the intermission (in minutes) using the drop down menu.</li>
+      <li>Tap set to update the intermission timer.</li>
+      <li>Tap run to start it counting down.</li>
+      <div class="highlight">
+        NOTE: The intermission timer will AUTOMATICALLY start when the game timer reaches zero.
+      </div>
+      <li>The next quarter will NOT automatically start.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Sirens</h2>
     <p>
-      Any changes made during runtime may affect live output. Use with care in live environments.
+      Sirens can be operated manually using the three buttons in this section.
     </p>
+      <ul>
+        <li>It is recommended you stop the timers if you are operating them manually.</li>
+        <div class="highlight">
+          Tip: This may be useful if you are connected to a speaker.
+        </div>
+      </ul>
+  </div>
+
+  <div class="card">
+    <h2>Notes & Contact</h2>
+    <ul>
+      <li>It is recommeded you 'Add to Home Screen' for optimal performance on a mobile device.</li>
+      <li>Ensure you are using a supported browser.</li>
+      <li>It remains the timer's responsibility to manage sirens. We take no responsibility for your mistakes.</li>
+      <li>For feedback or suggestions <a href="mailto:acamapps@outlook.com">email here</a>.</li>
+      
+    </ul>
   </div>
 
 </div>
