@@ -410,8 +410,10 @@
       let s = interSeconds % 60;
 
       intermissionTimer.textContent =
-        String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0') +
-        " [" + interSeconds + "]";
+          String(m).padStart(2,'0') + ":" + String(s).padStart(2,'0') +
+          " [" + interSeconds + "]" +
+          " RUN=" + interRunning +
+          " START=" + (interStartTime ? "Y" : "N");
 
       intermissionTimer.classList.toggle("warning", interSeconds <= 60);
 
