@@ -230,7 +230,7 @@ a {
 
 <div class="row footer">
   <div>
-    <a href="instructions.html">instructions</a> | acamapps v1.03
+    <a href="instructions.html">instructions</a> | acamapps v1.04
   </div>
 </div>
 
@@ -371,21 +371,22 @@ function updateGame(){
   gameTimer.classList.toggle("warning", !countUp && displaySeconds <= 60);
 
   /* ✅ BULLETPROOF GAME END */
-if (!countUp) {
-  if (displaySeconds <= 0 && !gameEnded) {
-    gameEnded = true;
+  if (!countUp) {
+    if (displaySeconds <= 0 && !gameEnded) {
+      gameEnded = true;
 
-    playSiren("full");
+      playSiren("full");
 
-    gameState = "PAUSED";
+      gameState = "PAUSED";
 
-    interDuration = parseInt(intermissionSelect.value || 0) * 60;
+      interDuration = parseInt(intermissionSelect.value || 0) * 60;
 
-    lastInterSeconds = null;
-    twoMinPlayed = false;
-    oneMinPlayed = false;
+      lastInterSeconds = null;
+      twoMinPlayed = false;
+      oneMinPlayed = false;
 
-    startIntermission();
+      startIntermission();
+    }
   }
 }
 
@@ -486,11 +487,6 @@ function getInterSeconds(){
 
 function updateIntermission(){
 
-  if (lastInterSeconds === null) {
-    lastInterSeconds = interSeconds;
-    return;
-  }
-
   let interSeconds = getInterSeconds();
 
   if (lastInterSeconds === null) {
@@ -505,7 +501,7 @@ function updateIntermission(){
 
   intermissionTimer.classList.toggle("warning", interSeconds <= 60);
 
- if (lastInterSeconds !== null && lastInterSeconds > interSeconds) {
+  if (lastInterSeconds !== null && lastInterSeconds > interSeconds) {
 
     if (lastInterSeconds > 120 && interSeconds <= 120 && !twoMinPlayed) {
       twoMinPlayed = true;
