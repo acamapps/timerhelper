@@ -1,4 +1,4 @@
-const CACHE_NAME = "footytimer-v1.06";
+const CACHE_NAME = "footytimer-v1.07";
 
 const FILES_TO_CACHE = [
   "./",
